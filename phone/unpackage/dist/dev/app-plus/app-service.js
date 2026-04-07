@@ -901,9 +901,6 @@ if (uni.restoreGlobal) {
         onClick: _cache[41] || (_cache[41] = (...args) => $options.handlePageClick && $options.handlePageClick(...args))
       },
       [
-        vue.createCommentVNode(" WebSocket 连接状态和消息 - 这些可能不再需要显示，因为拨号不依赖WS "),
-        vue.createCommentVNode(' <view class="ws-status">WebSocket 连接状态: {{ wsStatus }}</view> '),
-        vue.createCommentVNode(' <view v-if="messageStatus" class="message-status">{{ messageStatus }}</view> '),
         $data.dialStatusMessage ? (vue.openBlock(), vue.createElementBlock(
           "view",
           {
@@ -914,7 +911,6 @@ if (uni.restoreGlobal) {
           1
           /* TEXT */
         )) : vue.createCommentVNode("v-if", true),
-        vue.createCommentVNode(" 顶部内容和通话记录列表 (当 inputNumber 为空且有通话记录时显示) "),
         !$data.inputNumber && $data.callLogs.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 1,
           class: "miui-top-content"
@@ -927,7 +923,6 @@ if (uni.restoreGlobal) {
               }, ["stop", "prevent"]))
             },
             [
-              vue.createCommentVNode(" 右上角三个点按钮 "),
               vue.createElementVNode("view", {
                 class: "miui-more-btn",
                 onClick: _cache[0] || (_cache[0] = ($event) => $data.showMore = true)
@@ -939,7 +934,6 @@ if (uni.restoreGlobal) {
               vue.createElementVNode("view", { class: "miui-header-top" }, [
                 vue.createElementVNode("view", { class: "miui-title" }, "电话")
               ]),
-              vue.createCommentVNode(" 顶部tab栏 "),
               vue.createElementVNode("view", { class: "miui-tabbar" }, [
                 vue.createElementVNode(
                   "view",
@@ -966,7 +960,6 @@ if (uni.restoreGlobal) {
             32
             /* NEED_HYDRATION */
           ),
-          vue.createCommentVNode(" 通话记录列表 "),
           vue.createElementVNode(
             "view",
             {
@@ -1000,7 +993,6 @@ if (uni.restoreGlobal) {
                       onTouchmove: _cache[7] || (_cache[7] = (...args) => $options.touchMove && $options.touchMove(...args)),
                       "data-id": item.id
                     }, [
-                      vue.createCommentVNode(" 左侧：状态图标+手机号+归属地 "),
                       vue.createElementVNode("view", { style: { "display": "flex", "flex-direction": "column", "align-items": "flex-start" } }, [
                         vue.createElementVNode("view", { style: { "display": "flex", "align-items": "center" } }, [
                           vue.createElementVNode("image", {
@@ -1037,7 +1029,6 @@ if (uni.restoreGlobal) {
                           )
                         ])
                       ]),
-                      vue.createCommentVNode(" 右侧：来电时间+感叹号+info图标 "),
                       vue.createElementVNode("view", {
                         style: { "display": "flex", "align-items": "center" },
                         onClick: vue.withModifiers(($event) => $options.goToCallDetails(item.id), ["stop"])
@@ -1068,7 +1059,6 @@ if (uni.restoreGlobal) {
                 128
                 /* KEYED_FRAGMENT */
               )),
-              vue.createCommentVNode(" 添加加载状态提示 "),
               $data.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
                 key: 0,
                 class: "miui-batch-loading"
@@ -1082,7 +1072,6 @@ if (uni.restoreGlobal) {
             /* STYLE, NEED_HYDRATION */
           )
         ])) : vue.createCommentVNode("v-if", true),
-        vue.createCommentVNode(" 智能拨号提示 "),
         !$data.inputNumber && $data.callLogs.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 2,
           class: "miui-smart-dialing"
@@ -1101,7 +1090,6 @@ if (uni.restoreGlobal) {
             ])
           ])
         ])) : vue.createCommentVNode("v-if", true),
-        vue.createCommentVNode(" 输入号码时，号码和归属地浮动到页面中上方 "),
         $data.inputNumber ? (vue.openBlock(), vue.createElementBlock(
           "view",
           {
@@ -1220,7 +1208,6 @@ if (uni.restoreGlobal) {
           32
           /* NEED_HYDRATION */
         )) : vue.createCommentVNode("v-if", true),
-        vue.createCommentVNode(" 修改遮罩层的显示条件 "),
         $data.showDialpad && $data.callLogs.length > 0 && !$data.inputNumber ? (vue.openBlock(), vue.createElementBlock(
           "view",
           {
@@ -1239,7 +1226,6 @@ if (uni.restoreGlobal) {
           32
           /* NEED_HYDRATION */
         )) : vue.createCommentVNode("v-if", true),
-        vue.createCommentVNode(" 拨号盘部分 "),
         $data.showDialpad ? (vue.openBlock(), vue.createElementBlock(
           "view",
           {
@@ -1360,17 +1346,14 @@ if (uni.restoreGlobal) {
           36
           /* STYLE, NEED_HYDRATION */
         )) : vue.createCommentVNode("v-if", true),
-        vue.createCommentVNode(" 更多菜单弹窗 "),
         $data.showMore ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 6,
           class: "miui-more-popup"
         }, [
-          vue.createCommentVNode(" 遮罩层 "),
           vue.createElementVNode("view", {
             class: "miui-more-mask",
             onClick: _cache[32] || (_cache[32] = ($event) => $data.showMore = false)
           }),
-          vue.createCommentVNode(" 菜单内容 "),
           vue.createElementVNode("view", { class: "miui-more-menu" }, [
             vue.createElementVNode("view", {
               class: "miui-more-item",
@@ -1392,7 +1375,6 @@ if (uni.restoreGlobal) {
             class: "miui-icon-call"
           })
         ])) : vue.createCommentVNode("v-if", true),
-        vue.createCommentVNode(" MMI Error Dialog "),
         vue.withDirectives(vue.createElementVNode(
           "view",
           {
@@ -1431,7 +1413,6 @@ if (uni.restoreGlobal) {
         ), [
           [vue.vShow, $data.showMMIErrorDialog]
         ]),
-        vue.createCommentVNode(" Long Press Dialog "),
         vue.withDirectives(vue.createElementVNode(
           "view",
           {
@@ -1471,7 +1452,6 @@ if (uni.restoreGlobal) {
         ), [
           [vue.vShow, $data.showLongPressDialog]
         ]),
-        vue.createCommentVNode(" 模拟底部 Tabbar "),
         vue.withDirectives(vue.createElementVNode(
           "view",
           { class: "mock-tabbar" },
@@ -1508,7 +1488,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const PagesDialDial = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-19c976a0"], ["__file", "E:/masl/phone/pages/dial/dial.vue"]]);
+  const PagesDialDial = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-19c976a0"], ["__file", "C:/Coding/phone-web/phone/pages/dial/dial.vue"]]);
   const _sfc_main$a = {
     data() {
       return {
@@ -1658,7 +1638,7 @@ if (uni.restoreGlobal) {
       }, "登录")
     ]);
   }
-  const PagesAuthLogin = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2cc9f8c3"], ["__file", "E:/masl/phone/pages/auth/login.vue"]]);
+  const PagesAuthLogin = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2cc9f8c3"], ["__file", "C:/Coding/phone-web/phone/pages/auth/login.vue"]]);
   const { registerUTSInterface, initUTSProxyClass, initUTSProxyFunction, initUTSPackageName, initUTSIndexClassName, initUTSClassName } = uni;
   const name = "u7746Wallpaper";
   const moduleName = "u7746-wallpaper";
@@ -2962,7 +2942,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesCallCalling = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-620547d8"], ["__file", "E:/masl/phone/pages/call/calling.vue"]]);
+  const PagesCallCalling = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-620547d8"], ["__file", "C:/Coding/phone-web/phone/pages/call/calling.vue"]]);
   const _imports_0$5 = "/static/icons/lxr.png";
   const _sfc_main$8 = {
     data() {
@@ -2992,7 +2972,6 @@ if (uni.restoreGlobal) {
   };
   function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "contacts-page" }, [
-      vue.createCommentVNode(" 顶部内容，复用拨号页样式 "),
       vue.createElementVNode(
         "view",
         {
@@ -3008,7 +2987,6 @@ if (uni.restoreGlobal) {
         32
         /* NEED_HYDRATION */
       ),
-      vue.createCommentVNode(" 中间内容 "),
       vue.createElementVNode("view", { class: "contacts-empty" }, [
         vue.createElementVNode("image", {
           src: _imports_0$5,
@@ -3037,12 +3015,11 @@ if (uni.restoreGlobal) {
       ))
     ]);
   }
-  const PagesContactsContacts = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-90a1bbf6"], ["__file", "E:/masl/phone/pages/contacts/contacts.vue"]]);
+  const PagesContactsContacts = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-90a1bbf6"], ["__file", "C:/Coding/phone-web/phone/pages/contacts/contacts.vue"]]);
   const _imports_0$4 = "/static/icons/sc.png";
   const _sfc_main$7 = {};
   function _sfc_render$6(_ctx, _cache) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "contacts-page" }, [
-      vue.createCommentVNode(" 顶部内容，复用拨号页样式 "),
       vue.createElementVNode(
         "view",
         {
@@ -3058,7 +3035,6 @@ if (uni.restoreGlobal) {
         32
         /* NEED_HYDRATION */
       ),
-      vue.createCommentVNode(" 中间内容 "),
       vue.createElementVNode("view", { class: "contacts-empty" }, [
         vue.createElementVNode("image", {
           src: _imports_0$4,
@@ -3068,7 +3044,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesFavoriteFavorite = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-8850f19c"], ["__file", "E:/masl/phone/pages/favorite/favorite.vue"]]);
+  const PagesFavoriteFavorite = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-8850f19c"], ["__file", "C:/Coding/phone-web/phone/pages/favorite/favorite.vue"]]);
   const _imports_0$3 = "/static/icons/xx.png";
   const _imports_1$4 = "/static/icons/nz.png";
   const _sfc_main$6 = {
@@ -3695,7 +3671,6 @@ if (uni.restoreGlobal) {
         mode: "aspectFill"
       }, null, 8, ["src"]),
       vue.createElementVNode("view", { class: "call-content" }, [
-        vue.createCommentVNode(" 顶部信息区域 "),
         vue.createElementVNode("view", { class: "call-info" }, [
           vue.createElementVNode(
             "view",
@@ -3718,7 +3693,6 @@ if (uni.restoreGlobal) {
             }, "对方已振铃")) : vue.createCommentVNode("v-if", true)
           ])
         ]),
-        vue.createCommentVNode(" 按钮网格区域 "),
         vue.createElementVNode("view", { class: "button-grid" }, [
           vue.createElementVNode("view", { class: "grid-row" }, [
             vue.createElementVNode("view", { class: "action-item" }, [
@@ -3764,7 +3738,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesCallBackCallBack = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-3eeafad5"], ["__file", "E:/masl/phone/pages/call-back/call-back.vue"]]);
+  const PagesCallBackCallBack = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-3eeafad5"], ["__file", "C:/Coding/phone-web/phone/pages/call-back/call-back.vue"]]);
   const _imports_2$2 = "/static/icons/delete.png";
   const _sfc_main$5 = {
     data() {
@@ -3969,7 +3943,6 @@ if (uni.restoreGlobal) {
   };
   function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "miui-batch-page" }, [
-      vue.createCommentVNode(" 顶部导航栏 "),
       vue.createElementVNode("view", { class: "miui-batch-header" }, [
         vue.createElementVNode("text", {
           class: "miui-batch-close",
@@ -3985,7 +3958,6 @@ if (uni.restoreGlobal) {
           )
         ])
       ]),
-      vue.createCommentVNode(" 列表区域 "),
       vue.createElementVNode(
         "scroll-view",
         {
@@ -4003,9 +3975,7 @@ if (uni.restoreGlobal) {
                 key: item.id,
                 onClick: ($event) => $options.toggleSelectItem(item)
               }, [
-                vue.createCommentVNode(" 左侧区域：包含两行信息 "),
                 vue.createElementVNode("view", { class: "miui-batch-item-left" }, [
-                  vue.createCommentVNode(" 第一行：状态图标 + 号码 "),
                   vue.createElementVNode("view", { class: "miui-batch-line-top" }, [
                     vue.createElementVNode("image", {
                       class: "miui-batch-call-status-icon",
@@ -4019,7 +3989,6 @@ if (uni.restoreGlobal) {
                       /* TEXT */
                     )
                   ]),
-                  vue.createCommentVNode(" 第二行：占位图标 + HD图标 + 归属地 "),
                   vue.createElementVNode("view", { class: "miui-batch-line-bottom" }, [
                     vue.createElementVNode("image", {
                       class: "miui-batch-placeholder-icon",
@@ -4038,7 +4007,6 @@ if (uni.restoreGlobal) {
                     )
                   ])
                 ]),
-                vue.createCommentVNode(" 右侧：时间+勾选框 "),
                 vue.createElementVNode("view", { class: "miui-batch-item-right" }, [
                   vue.createElementVNode(
                     "text",
@@ -4058,7 +4026,6 @@ if (uni.restoreGlobal) {
             128
             /* KEYED_FRAGMENT */
           )),
-          vue.createCommentVNode(" 加载更多提示 "),
           $data.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 0,
             class: "miui-batch-loading"
@@ -4071,7 +4038,6 @@ if (uni.restoreGlobal) {
         32
         /* NEED_HYDRATION */
       ),
-      vue.createCommentVNode(" 底部操作栏 "),
       vue.createElementVNode("view", { class: "miui-batch-footer" }, [
         vue.createElementVNode("view", { class: "miui-batch-footer-content" }, [
           vue.createElementVNode(
@@ -4110,7 +4076,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesBatchDeleteRecordsBatchDeleteRecords = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-19f34c31"], ["__file", "E:/masl/phone/pages/batch-delete-records/batch-delete-records.vue"]]);
+  const PagesBatchDeleteRecordsBatchDeleteRecords = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-19f34c31"], ["__file", "C:/Coding/phone-web/phone/pages/batch-delete-records/batch-delete-records.vue"]]);
   const _imports_0$2 = "/static/icons/phone1.png";
   const _imports_1$3 = "/static/icons/video1.png";
   const _imports_2$1 = "/static/icons/message.png";
@@ -4334,9 +4300,7 @@ if (uni.restoreGlobal) {
   };
   function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "call-history-page" }, [
-      vue.createCommentVNode(" 顶部紫色背景区域 "),
       vue.createElementVNode("view", { class: "top-purple-bg" }),
-      vue.createCommentVNode(" 顶部居中头像 "),
       vue.createElementVNode("view", { class: "top-centered-info" }, [
         vue.createElementVNode("image", {
           class: "large-avatar",
@@ -4344,11 +4308,8 @@ if (uni.restoreGlobal) {
           mode: "aspectFill"
         }, null, 8, ["src"])
       ]),
-      vue.createCommentVNode(" 主要内容容器 "),
       vue.createElementVNode("view", { class: "main-content-area" }, [
-        vue.createCommentVNode(" 信息卡片分组 "),
         vue.createElementVNode("view", { class: "info-card-group" }, [
-          vue.createCommentVNode(" 大电话号码 "),
           vue.createElementVNode(
             "view",
             { class: "large-phone-number" },
@@ -4356,7 +4317,6 @@ if (uni.restoreGlobal) {
             1
             /* TEXT */
           ),
-          vue.createCommentVNode(" 联系人信息卡片 "),
           vue.createElementVNode("view", { class: "contact-card" }, [
             vue.createElementVNode("view", { class: "phone-and-location" }, [
               vue.createElementVNode(
@@ -4397,9 +4357,7 @@ if (uni.restoreGlobal) {
             ])
           ])
         ]),
-        vue.createCommentVNode(" 通话记录板块 "),
         vue.createElementVNode("view", { class: "call-history-section" }, [
-          vue.createCommentVNode(" 通话记录头部 "),
           vue.createElementVNode("view", { class: "history-section-header" }, [
             vue.createElementVNode("view", { class: "section-title" }, [
               vue.createElementVNode("text", { class: "title-text" }, "通话记录")
@@ -4411,92 +4369,78 @@ if (uni.restoreGlobal) {
               vue.createElementVNode("text", { class: "clear-text" }, "清空")
             ])
           ]),
-          vue.createCommentVNode(" 加载状态 "),
           $data.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 0,
             class: "loading-state"
           }, [
             vue.createElementVNode("text", null, "加载中...")
-          ])) : $data.error ? (vue.openBlock(), vue.createElementBlock(
-            vue.Fragment,
-            { key: 1 },
-            [
-              vue.createCommentVNode(" 错误状态 "),
-              vue.createElementVNode("view", { class: "error-state" }, [
-                vue.createElementVNode(
-                  "text",
-                  null,
-                  vue.toDisplayString($data.error),
-                  1
-                  /* TEXT */
-                )
-              ])
-            ],
-            2112
-            /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
-          )) : (vue.openBlock(), vue.createElementBlock(
-            vue.Fragment,
-            { key: 2 },
-            [
-              vue.createCommentVNode(" 通话记录列表 "),
-              vue.createElementVNode("view", { class: "call-records-list" }, [
-                (vue.openBlock(true), vue.createElementBlock(
-                  vue.Fragment,
-                  null,
-                  vue.renderList($data.callRecords, (record, index) => {
-                    return vue.openBlock(), vue.createElementBlock("view", {
-                      key: index,
-                      class: "call-record-item"
-                    }, [
-                      vue.createElementVNode("view", { class: "left-section" }, [
-                        vue.createElementVNode("view", { class: "record-datetime" }, [
-                          vue.createElementVNode(
-                            "text",
-                            { class: "date-time-text" },
-                            vue.toDisplayString($options.formatTime(record.start_time)),
-                            1
-                            /* TEXT */
-                          )
-                        ]),
-                        vue.createElementVNode("view", { class: "phone-with-icon" }, [
-                          vue.createElementVNode("image", {
-                            class: "phone-icon",
-                            src: $options.getStatusIcon(record.status),
-                            mode: "widthFix"
-                          }, null, 8, ["src"]),
-                          vue.createElementVNode(
-                            "text",
-                            { class: "record-phone-number" },
-                            vue.toDisplayString(record.display_name),
-                            1
-                            /* TEXT */
-                          )
-                        ])
-                      ]),
-                      vue.createElementVNode("view", { class: "right-section" }, [
-                        vue.createElementVNode(
-                          "text",
-                          {
-                            class: vue.normalizeClass(["status-text", { "missed": record.status === "missed" || record.status === "no_answer" }])
-                          },
-                          vue.toDisplayString($options.getStatusText(record)),
-                          3
-                          /* TEXT, CLASS */
-                        )
-                      ])
-                    ]);
-                  }),
-                  128
-                  /* KEYED_FRAGMENT */
-                ))
-              ])
-            ],
-            2112
-            /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
-          ))
+          ])) : $data.error ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 1,
+            class: "error-state"
+          }, [
+            vue.createElementVNode(
+              "text",
+              null,
+              vue.toDisplayString($data.error),
+              1
+              /* TEXT */
+            )
+          ])) : (vue.openBlock(), vue.createElementBlock("view", {
+            key: 2,
+            class: "call-records-list"
+          }, [
+            (vue.openBlock(true), vue.createElementBlock(
+              vue.Fragment,
+              null,
+              vue.renderList($data.callRecords, (record, index) => {
+                return vue.openBlock(), vue.createElementBlock("view", {
+                  key: index,
+                  class: "call-record-item"
+                }, [
+                  vue.createElementVNode("view", { class: "left-section" }, [
+                    vue.createElementVNode("view", { class: "record-datetime" }, [
+                      vue.createElementVNode(
+                        "text",
+                        { class: "date-time-text" },
+                        vue.toDisplayString($options.formatTime(record.start_time)),
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    vue.createElementVNode("view", { class: "phone-with-icon" }, [
+                      vue.createElementVNode("image", {
+                        class: "phone-icon",
+                        src: $options.getStatusIcon(record.status),
+                        mode: "widthFix"
+                      }, null, 8, ["src"]),
+                      vue.createElementVNode(
+                        "text",
+                        { class: "record-phone-number" },
+                        vue.toDisplayString(record.display_name),
+                        1
+                        /* TEXT */
+                      )
+                    ])
+                  ]),
+                  vue.createElementVNode("view", { class: "right-section" }, [
+                    vue.createElementVNode(
+                      "text",
+                      {
+                        class: vue.normalizeClass(["status-text", { "missed": record.status === "missed" || record.status === "no_answer" }])
+                      },
+                      vue.toDisplayString($options.getStatusText(record)),
+                      3
+                      /* TEXT, CLASS */
+                    )
+                  ])
+                ]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ]))
         ])
       ]),
-      vue.createCommentVNode(" 添加自定义确认弹窗 "),
       $data.showConfirmModal ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "custom-modal-mask",
@@ -4523,7 +4467,7 @@ if (uni.restoreGlobal) {
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const PagesCallDetailsCallDetails = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-3f343424"], ["__file", "E:/masl/phone/pages/call-details/call-details.vue"]]);
+  const PagesCallDetailsCallDetails = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-3f343424"], ["__file", "C:/Coding/phone-web/phone/pages/call-details/call-details.vue"]]);
   const _imports_0$1 = "/static/icons/back1.png";
   const _imports_1$2 = "/static/icon/people.png";
   const _imports_2 = "/static/icons/people.png";
@@ -4587,7 +4531,6 @@ if (uni.restoreGlobal) {
   };
   function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "new-message-container" }, [
-      vue.createCommentVNode(" 顶部栏 "),
       vue.createElementVNode("view", { class: "header" }, [
         vue.createElementVNode("image", {
           class: "back-icon",
@@ -4600,7 +4543,6 @@ if (uni.restoreGlobal) {
           src: _imports_1$2
         })
       ]),
-      vue.createCommentVNode(" 收件人输入框 "),
       vue.createElementVNode("view", { class: "recipient-area" }, [
         vue.createElementVNode("text", { class: "recipient-label" }, "收件人:"),
         vue.withDirectives(vue.createElementVNode(
@@ -4622,10 +4564,7 @@ if (uni.restoreGlobal) {
           src: _imports_2
         })
       ]),
-      vue.createCommentVNode(" 消息内容输入区 (底部) "),
-      vue.createCommentVNode(" 底部输入栏 "),
       vue.createElementVNode("view", { class: "chat-footer" }, [
-        vue.createCommentVNode(' <view class="chat-plus">+</view> '),
         vue.createElementVNode("image", {
           class: "chat-plus",
           src: _imports_3
@@ -4649,12 +4588,11 @@ if (uni.restoreGlobal) {
           class: "chat-send",
           src: _imports_4,
           onClick: _cache[3] || (_cache[3] = (...args) => $options.sendMessage && $options.sendMessage(...args))
-        }),
-        vue.createCommentVNode(' <view class="chat-send">&#8593;</view> ')
+        })
       ])
     ]);
   }
-  const PagesMessageNewMessage = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-8a26534b"], ["__file", "E:/masl/phone/pages/message/new-message.vue"]]);
+  const PagesMessageNewMessage = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-8a26534b"], ["__file", "C:/Coding/phone-web/phone/pages/message/new-message.vue"]]);
   const _imports_1$1 = "/static/icons/avatar1.png";
   const _imports_1 = "/static/icons/more.png";
   const _sfc_main$2 = {
@@ -4927,7 +4865,6 @@ if (uni.restoreGlobal) {
   };
   function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "chat-container" }, [
-      vue.createCommentVNode(" 顶部栏 "),
       vue.createElementVNode("view", { class: "chat-header" }, [
         vue.createElementVNode("image", {
           class: "chat-back",
@@ -4952,7 +4889,6 @@ if (uni.restoreGlobal) {
           onClick: _cache[1] || (_cache[1] = (...args) => $options.showMenu && $options.showMenu(...args))
         })
       ]),
-      vue.createCommentVNode(" 弹出菜单 "),
       $data.isMenuVisible ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "menu-popup",
@@ -4978,7 +4914,6 @@ if (uni.restoreGlobal) {
           ))
         ])
       ])) : vue.createCommentVNode("v-if", true),
-      vue.createCommentVNode(" 确认删除弹窗 "),
       $data.isConfirmVisible ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "confirm-dialog",
@@ -5002,7 +4937,6 @@ if (uni.restoreGlobal) {
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
-      vue.createCommentVNode(" 聊天内容区 "),
       vue.createElementVNode("scroll-view", {
         class: "chat-body",
         "scroll-y": "true",
@@ -5010,7 +4944,6 @@ if (uni.restoreGlobal) {
         onScrolltoupper: _cache[8] || (_cache[8] = (...args) => $options.loadMoreMessages && $options.loadMoreMessages(...args)),
         "scroll-with-animation": ""
       }, [
-        vue.createCommentVNode(" 消息列表 "),
         (vue.openBlock(true), vue.createElementBlock(
           vue.Fragment,
           null,
@@ -5022,7 +4955,6 @@ if (uni.restoreGlobal) {
                 class: vue.normalizeClass(["chat-item", { "chat-item-left": !message.ismy, "chat-item-right": message.ismy }])
               },
               [
-                vue.createCommentVNode(" 左侧气泡（对方消息）和时间 "),
                 !message.ismy ? (vue.openBlock(), vue.createElementBlock("view", {
                   key: 0,
                   class: "other-message-group"
@@ -5034,7 +4966,6 @@ if (uni.restoreGlobal) {
                     1
                     /* TEXT */
                   ),
-                  vue.createCommentVNode(" 对方消息时间，与气泡左对齐 "),
                   vue.createElementVNode(
                     "view",
                     { class: "chat-bubble other time" },
@@ -5042,32 +4973,25 @@ if (uni.restoreGlobal) {
                     1
                     /* TEXT */
                   )
-                ])) : (vue.openBlock(), vue.createElementBlock(
-                  vue.Fragment,
-                  { key: 1 },
-                  [
-                    vue.createCommentVNode(" 右侧气泡（自己消息）和时间 "),
-                    vue.createElementVNode("view", { class: "self-message-group" }, [
-                      vue.createElementVNode(
-                        "view",
-                        { class: "chat-bubble self" },
-                        vue.toDisplayString(message.text),
-                        1
-                        /* TEXT */
-                      ),
-                      vue.createCommentVNode(" 自己的消息时间，与气泡右对齐 "),
-                      vue.createElementVNode(
-                        "view",
-                        { class: "chat-bubble self time" },
-                        vue.toDisplayString($options.formatMessageTime(message.time)),
-                        1
-                        /* TEXT */
-                      )
-                    ])
-                  ],
-                  2112
-                  /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
-                ))
+                ])) : (vue.openBlock(), vue.createElementBlock("view", {
+                  key: 1,
+                  class: "self-message-group"
+                }, [
+                  vue.createElementVNode(
+                    "view",
+                    { class: "chat-bubble self" },
+                    vue.toDisplayString(message.text),
+                    1
+                    /* TEXT */
+                  ),
+                  vue.createElementVNode(
+                    "view",
+                    { class: "chat-bubble self time" },
+                    vue.toDisplayString($options.formatMessageTime(message.time)),
+                    1
+                    /* TEXT */
+                  )
+                ]))
               ],
               2
               /* CLASS */
@@ -5076,13 +5000,11 @@ if (uni.restoreGlobal) {
           128
           /* KEYED_FRAGMENT */
         )),
-        vue.createCommentVNode(" 加载提示 "),
         $data.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 0,
           class: "loading-more-text"
         }, "加载中...")) : vue.createCommentVNode("v-if", true)
       ], 40, ["scroll-top"]),
-      vue.createCommentVNode(" 底部输入栏 "),
       vue.createElementVNode("view", { class: "chat-footer" }, [
         vue.createElementVNode("image", {
           class: "chat-plus",
@@ -5114,7 +5036,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesMessageChat = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-013fa921"], ["__file", "E:/masl/phone/pages/message/chat.vue"]]);
+  const PagesMessageChat = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-013fa921"], ["__file", "C:/Coding/phone-web/phone/pages/message/chat.vue"]]);
   const _imports_0 = "/static/icons/add1.png";
   const _sfc_main$1 = {
     name: "MessagePage",
@@ -5317,7 +5239,6 @@ if (uni.restoreGlobal) {
       class: "container",
       onClick: _cache[7] || (_cache[7] = (...args) => $options.resetAllItems && $options.resetAllItems(...args))
     }, [
-      vue.createCommentVNode(" 顶部栏 "),
       vue.createElementVNode("view", { class: "header" }, [
         vue.createElementVNode("view", null, [
           vue.createElementVNode("view", { class: "title" }, "信息")
@@ -5335,7 +5256,6 @@ if (uni.restoreGlobal) {
           })
         ])
       ]),
-      vue.createCommentVNode(" 消息列表 "),
       vue.createElementVNode("view", { class: "msg-list" }, [
         (vue.openBlock(true), vue.createElementBlock(
           vue.Fragment,
@@ -5393,7 +5313,6 @@ if (uni.restoreGlobal) {
           /* KEYED_FRAGMENT */
         ))
       ]),
-      vue.createCommentVNode(" 弹出菜单 "),
       $data.isMenuVisible ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "menu-popup",
@@ -5421,7 +5340,7 @@ if (uni.restoreGlobal) {
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-4c1b26cf"], ["__file", "E:/masl/phone/pages/message/message.vue"]]);
+  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-4c1b26cf"], ["__file", "C:/Coding/phone-web/phone/pages/message/message.vue"]]);
   __definePage("pages/dial/dial", PagesDialDial);
   __definePage("pages/auth/login", PagesAuthLogin);
   __definePage("pages/call/calling", PagesCallCalling);
@@ -5482,7 +5401,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "E:/masl/phone/App.vue"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "C:/Coding/phone-web/phone/App.vue"]]);
   function createApp() {
     const app = vue.createVueApp(App);
     return {

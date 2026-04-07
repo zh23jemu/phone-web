@@ -1,0 +1,58 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.suo
+*.user
+*.userossc
+*.swp
+*.swn
+*.tmp
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Logs
+*.log
+logs/
+
+# Local env / secrets
+.env
+.env.*
+!.env.example
+!.example.env
+
+# APK / mobile build outputs
+*.apk
+*.aab
+
+# uni-app / HBuilderX generated files
+phone/unpackage/
+phone/.hbuilderx/private.config.json
+message/unpackage/
+message/.hbuilderx/private.config.json
+
+# Node
+node_modules/
+dist/
+coverage/
+
+# likeadmin local runtime / dependencies
+likeadmin_php-master/server/runtime/
+likeadmin_php-master/server/vendor/
+likeadmin_php-master/admin/node_modules/
+likeadmin_php-master/admin/dist/
+
+# Docker / database local data
+likeadmin_php-master/docker/data/
+likeadmin_php-master/docker/log/
+
