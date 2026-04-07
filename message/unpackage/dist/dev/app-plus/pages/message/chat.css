@@ -1,0 +1,271 @@
+
+.chat-container[data-v-013fa921] {
+  background: #f5f6f7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.chat-header[data-v-013fa921] {
+  display: flex;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  padding: 2.3125rem 0.625rem 0.75rem 0.625rem;
+  background: #f5f6f7;
+  font-size: 1rem;
+}
+.chat-back[data-v-013fa921] {
+  height: 1.875rem;
+  width: 1.875rem;
+  margin-right: 0.625rem;
+}
+.chat-avatar[data-v-013fa921] {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: #eee;
+  margin-left: 0.625rem;
+  margin-right: 0.625rem;
+}
+.chat-phone[data-v-013fa921] {
+  font-size: 1.125rem;
+  font-family: monospace;
+  margin-left: 0.3125rem;
+  color: #222;
+  flex: 1;
+}
+.chat-menu[data-v-013fa921] {
+  height: 1.5625rem;
+  width: 1.5625rem;
+  font-size: 1.5rem;
+  margin-left: 0.625rem;
+  color: #333;
+}
+
+/* 消息列表 */
+.chat-body[data-v-013fa921] {
+  position: absolute;
+  top: 5.625rem;
+  bottom: 3.75rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  overflow-y: auto;
+}
+
+/* 每条消息项 */
+.chat-item[data-v-013fa921] {
+  display: flex;
+  padding: 0.625rem 1.25rem;
+}
+.chat-item-left[data-v-013fa921] {
+  justify-content: flex-start;
+}
+.chat-item-right[data-v-013fa921] {
+  justify-content: flex-end;
+}
+
+/* 对方消息气泡和时间组合容器 */
+.other-message-group[data-v-013fa921] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* 自己的消息气泡和时间组合容器 */
+.self-message-group[data-v-013fa921] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* 聊天气泡基础样式 */
+.chat-bubble[data-v-013fa921] {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 1.25rem;
+  color: #222;
+  max-width: 100%;
+  word-break: break-word;
+  box-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.1);
+}
+
+/* 对方消息气泡 */
+.other-message-group .chat-bubble[data-v-013fa921] {
+  background: #fff;
+}
+
+/* 自己的消息气泡 */
+.chat-bubble.self[data-v-013fa921] {
+  background: #e6f4ea;
+}
+
+/* 对方消息时间戳 */
+.chat-bubble.other.time[data-v-013fa921] {
+  background: none;
+  color: #aaa;
+  font-size: 0.75rem;
+  box-shadow: none;
+  padding: 0;
+  margin-top: 0.25rem;
+  min-width: unset;
+  text-align: left;
+}
+
+/* 自己的消息时间戳 */
+.chat-bubble.self.time[data-v-013fa921] {
+  background: none;
+  color: #aaa;
+  font-size: 0.75rem;
+  box-shadow: none;
+  padding: 0;
+  margin-top: 0.25rem;
+  min-width: unset;
+}
+
+/* 加载更多/没有更多提示文本样式 */
+.loading-more-text[data-v-013fa921] {
+  text-align: center;
+  color: #999;
+  font-size: 0.875rem;
+  padding: 0.625rem 0;
+}
+
+/* 底部输入栏 */
+.chat-footer[data-v-013fa921] {
+  display: flex;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 0.5rem 0.625rem 0 0;
+  background: #fff;
+  border-top: 0.03125rem solid #eee;
+  z-index: 100;
+}
+.chat-plus[data-v-013fa921] {
+  height: 1.5625rem;
+  width: 1.5625rem;
+  font-size: 1.5rem;
+  color: #4CD964;
+  margin-right: 0.625rem;
+}
+.chat-input-area[data-v-013fa921] {
+  flex: 1;
+  background: #f5f6f7;
+  border-radius: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.25rem 0.75rem;
+  margin-right: 0;
+}
+.chat-input[data-v-013fa921] {
+  border: none;
+  background: transparent;
+  font-size: 1.125rem;
+  width: 95%;
+  outline: none;
+  padding: 0;
+  line-height: 1.4;
+}
+.chat-send[data-v-013fa921] {
+  height: 1.875rem;
+  width: 1.875rem;
+  opacity: 0.8;
+}
+.chat-send[data-v-013fa921]:active {
+  opacity: 0.6;
+}
+
+/* 弹出菜单样式 */
+.menu-popup[data-v-013fa921] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-top: 2.5rem;
+}
+.menu-content[data-v-013fa921] {
+  background-color: #fff;
+  border-radius: 0;
+  width: 50%;
+  margin-right: 0.9375rem;
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+.menu-item[data-v-013fa921] {
+  padding: 0.9375rem 1.25rem;
+  font-size: 1rem;
+  color: #333;
+  text-align: left;
+  padding-left: 1.25rem;
+}
+.menu-item[data-v-013fa921]:active {
+  background-color: #f5f5f5;
+}
+
+/* 确认弹窗样式 */
+.confirm-dialog[data-v-013fa921] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.confirm-content[data-v-013fa921] {
+  background-color: #fff;
+  border-radius: 0;
+  width: 15.625rem;
+  padding: 1.25rem;
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.15);
+}
+.confirm-title[data-v-013fa921] {
+  font-size: 1rem;
+  color: #333;
+  text-align: left;
+  margin-bottom: 1.25rem;
+}
+.confirm-buttons[data-v-013fa921] {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.9375rem;
+}
+.confirm-button[data-v-013fa921] {
+  height: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+  border-radius: 0;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: #007aff;
+  padding: 0;
+}
+.confirm-button.cancel[data-v-013fa921] {
+  color: #40E0D0;
+  background: none;
+}
+.confirm-button.confirm[data-v-013fa921] {
+  color: #40E0D0;
+  background: none;
+}

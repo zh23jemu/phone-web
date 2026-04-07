@@ -1,0 +1,356 @@
+
+.call-history-page[data-v-3f343424] {
+  background-color: #ffffff; /* 页面整体背景色为白色 */
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 1.25rem;
+  /* 移除 flex 布局，使用 block 流 */
+  display: block;
+  flex-direction: initial;
+}
+.top-purple-bg[data-v-3f343424] {
+  background-color: #e7e1d1; 
+  height: 29vh; /* 占页面高度的29% */
+  width: 100%;
+  /* 移除绝对定位和 flexbox 控制 */
+  position: static;
+  top: auto;
+  left: auto;
+  z-index: auto;
+}
+.main-content-area[data-v-3f343424] {
+    /* position: relative; */ /* 移除相对定位 */
+    z-index: 1; /* 确保在紫色背景上方 */
+    /* 移除 margin-top，使其紧随紫色背景下方 */
+    margin-top: 0;
+    display: flex; /* 设置为 flex 容器 */
+    flex-direction: column; /* 子元素纵向排列 */
+    align-items: center; /* 使内部内容水平居中 */
+    background-color: #ffffff; /* 设置主内容区域背景为白色 */
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
+    /* 调整 padding-top，为悬浮的头像留出空间 */
+    padding-top: 3.75rem; /* 为头像下方部分留出空间 */
+    flex-grow: 1;
+}
+
+/* 顶部居中头像 */
+.top-centered-info[data-v-3f343424] {
+    /* 恢复绝对定位以悬浮 */
+    position: absolute;
+    top: calc(29vh - 2.5rem); /* 垂直居中在 29vh 交界处 */
+    left: 50%; /* 水平居中 */
+    transform: translateX(-50%); /* 精确水平居中 */
+    z-index: 2; /* 确保在所有背景和内容上方 */
+    /* 移除 flex 布局相关样式 */
+    display: block;
+    flex-direction: initial;
+    align-items: initial;
+    margin-bottom: 0; /* 移除 margin-bottom */
+}
+.large-avatar[data-v-3f343424] {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background-color: #ddd;
+    margin-bottom: 0; /* 移除头像下方的间距 */
+    border: 0.1875rem solid rgba(255, 255, 255, 0.5); /* 图片上的白色边框 */
+}
+.large-phone-number[data-v-3f343424] {
+    font-size: 1.5rem;
+    font-family: monospace;
+    color: #333;
+    /* 在 info-card-group 中居中 */
+    text-align: center;
+    margin-bottom: 0.625rem; /* 与下方卡片的间距 */
+}
+
+/* 信息卡片分组 */
+.info-card-group[data-v-3f343424] {
+    width: 21.5625rem; /* 与卡片宽度一致 */
+    /* background-color: #fff; */ /* 背景色由 main-content-area 提供 */
+    border-radius: 0.625rem; /* 圆角 */
+    /* margin: 0 auto; */ /* 由 main-content-area 的 align-items 居中 */
+    padding: 0.9375rem; /* 内边距 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 使内部元素（号码和卡片）居中 */
+    box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.1); /* 阴影 */
+    margin-bottom: 1.25rem; /* 与下方头部间距 */
+    margin-top: 0; /* 确保没有额外的顶部间距 */
+}
+
+/* 联系人信息卡片 */
+.contact-card[data-v-3f343424] {
+    background-color: #fff; /* 保持白色背景 */
+    border-radius: 0.625rem;
+    width: 100%; /* 在 info-card-group 中占满宽度 */
+    /* margin: 0 auto; */ /* 在 info-card-group 中由父元素居中 */
+    padding: 0; /* 内边距移至 info-card-group */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1); */ /* 阴影移至 info-card-group */
+    /* margin-bottom: 40rpx; */ /* 间距移至 info-card-group */
+}
+.phone-and-location[data-v-3f343424] {
+    display: flex;
+    flex-direction: column;
+}
+.phone-number-small[data-v-3f343424] {
+    font-size: 1.125rem;
+    font-family: monospace;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+.location-with-pinyin[data-v-3f343424] {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.875rem;
+    color: #666;
+}
+.action-icons[data-v-3f343424] {
+	
+    display: flex;
+    align-items: center;
+}
+.icon[data-v-3f343424] {
+    width: 1.5625rem;
+    height: 1.5625rem;
+    margin-left: 0.9375rem; /* 调整图标间距 */
+}
+
+/* 通话记录头部 */
+.history-section-header[data-v-3f343424] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   /* padding: 0 30rpx; /* 移除，由父级控制 */
+   /* margin: 0 30rpx 30rpx 30rpx; *//* 调整外边距 */ 
+	padding: 0 0; /* 移除，由父级控制 */
+	margin: 0 0.9375rem 0.9375rem 0.9375rem; /* 调整外边距 */
+    /* border-bottom: 1rpx solid #eee; */ /* 移除分隔线 */
+    padding-bottom: 0;
+    width: 100%; /* 移除，由父级控制 */
+    box-sizing: border-box; /* 移除，由父级控制 */
+}
+.section-title[data-v-3f343424],
+.clear-button[data-v-3f343424] {
+    display: flex;
+    flex-direction: column;
+}
+.section-title[data-v-3f343424] {
+    align-items: flex-start;
+    padding-left: 0; /* 确保与通话时间对齐 */
+}
+.clear-button[data-v-3f343424] {
+    align-items: flex-end;
+    padding-right: 0; /* 确保与状态文本对齐 */
+}
+.title-text[data-v-3f343424],
+.clear-text[data-v-3f343424] {
+    font-size: 1rem;
+    color: #333;
+}
+.title-text[data-v-3f343424]{
+	margin-right: 3.125rem;
+}
+.clear-text[data-v-3f343424] {
+    color: #007aff; /* 蓝色 */
+	margin-right: 1.84375rem;
+}
+
+
+/* 通话记录列表 */
+.call-records-list[data-v-3f343424] {
+  padding: 0 0.9375rem; /* 移除，由父级控制 */
+  /* background-color: #ffffff; */ /* 移除列表区域背景为白色 */
+  width: 100%; /* 移除，由父级控制 */
+  box-sizing: border-box; /* 移除，由父级控制 */
+}
+.call-record-item[data-v-3f343424] {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.625rem 0;
+  /* border-bottom: 1rpx solid #eee; */ /* 移除分隔线 */
+}
+.left-section[data-v-3f343424] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.record-datetime[data-v-3f343424] {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+.phone-with-icon[data-v-3f343424] {
+    display: flex;
+    align-items: center;
+}
+.phone-icon[data-v-3f343424] {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.25rem;
+}
+.record-phone-number[data-v-3f343424] {
+    font-size: 1rem;
+    color: #333;
+}
+.right-section[data-v-3f343424] {
+    display: flex;
+    align-items: center;
+}
+.status-text[data-v-3f343424] {
+    font-size: 1rem;
+    color: #999;  /* 默认灰色 */
+}
+
+/* 未接来电显示红色 */
+.call-record-item .status-text.missed[data-v-3f343424] {
+    color: #ff3b30;  /* iOS red color */
+}
+
+/* 新的通话记录板块容器 */
+.call-history-section[data-v-3f343424] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 0.9375rem; /* 添加共享内边距 */
+    /* 根据需要添加背景、边距、圆角等样式 */
+}
+
+/* 自定义弹窗样式 */
+.custom-modal-mask[data-v-3f343424] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.custom-modal-box[data-v-3f343424] {
+  width: 80%;
+  background: #fff;
+  border-radius: 0;
+  overflow: hidden;
+}
+.custom-modal-title[data-v-3f343424] {
+  padding: 0.625rem 0.9375rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 0.03125rem solid #eee;
+}
+.custom-modal-content[data-v-3f343424] {
+  padding: 0.9375rem;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+}
+.custom-modal-footer[data-v-3f343424] {
+  display: flex;
+  border-top: 0.03125rem solid #eee;
+}
+.custom-modal-btn[data-v-3f343424] {
+  flex: 1;
+  height: 2.75rem;
+  line-height: 2.75rem;
+  text-align: center;
+  font-size: 1rem;
+}
+.custom-modal-btn.cancel[data-v-3f343424] {
+  color: #666;
+  border-right: 0.03125rem solid #eee;
+}
+.custom-modal-btn.confirm[data-v-3f343424] {
+  color: #007aff;
+}
+
+
+/* 全局样式，用于修改弹窗样式 */
+.uni-modal,
+.uni-modal *,
+.uni-modal__mask,
+.uni-modal__wrapper,
+.uni-modal__box,
+.uni-modal__header,
+.uni-modal__body,
+.uni-modal__footer,
+.uni-modal__button,
+.uni-modal__button-text,
+.uni-modal__content,
+.uni-modal__dialog,
+.uni-modal__title,
+.uni-modal__bd,
+.uni-modal__ft,
+.uni-modal__btn,
+.uni-modal__btn_primary,
+.uni-modal__btn_default {
+    border-radius: 0 !important;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+}
+
+/* 确保弹窗内容区域也是方的 */
+.uni-modal__box {
+    border-radius: 0 !important;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    overflow: hidden !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+/* 确保按钮也是方的 */
+.uni-modal__button {
+    border-radius: 0 !important;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    overflow: hidden !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+/* 确保遮罩层也是方的 */
+.uni-modal__mask {
+    border-radius: 0 !important;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    overflow: hidden !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+/* 添加更高优先级的选择器 */
+:root .uni-modal,
+:root .uni-modal *,
+:root .uni-modal__mask,
+:root .uni-modal__wrapper,
+:root .uni-modal__box,
+:root .uni-modal__header,
+:root .uni-modal__body,
+:root .uni-modal__footer,
+:root .uni-modal__button,
+:root .uni-modal__button-text,
+:root .uni-modal__content,
+:root .uni-modal__dialog,
+:root .uni-modal__title,
+:root .uni-modal__bd,
+:root .uni-modal__ft,
+:root .uni-modal__btn,
+:root .uni-modal__btn_primary,
+:root .uni-modal__btn_default {
+    border-radius: 0 !important;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+}

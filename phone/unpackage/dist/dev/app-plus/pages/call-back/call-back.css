@@ -1,0 +1,135 @@
+
+.call-bg[data-v-3eeafad5] {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+.call-bg[data-v-3eeafad5]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+.bg-img[data-v-3eeafad5] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+.call-content[data-v-3eeafad5] {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0 5vw;
+    box-sizing: border-box;
+}
+
+/* 顶部信息区域 */
+.call-info[data-v-3eeafad5] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding-top: 15vh;
+}
+.call-number[data-v-3eeafad5] {
+    font-size: clamp(1.5rem, 8vw, 2.03125rem);  /* 与 calling 页面一致 */
+    color: #fff;
+    font-weight: bold;
+    letter-spacing: 0.0625rem;
+    text-align: center;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 2vh;
+}
+.call-location[data-v-3eeafad5] {
+    color: #adadad;
+    text-align: center;
+    width: 100%;
+}
+.hanzi[data-v-3eeafad5] {
+    font-size: clamp(0.875rem, 4vw, 1rem);  /* 与 calling 页面一致 */
+    display: block;
+    line-height: 1.4;
+}
+.status[data-v-3eeafad5] {
+    font-size: clamp(0.75rem, 3.5vw, 0.875rem);  /* 与 calling 页面一致 */
+    color: #adadad;
+    display: block;
+    line-height: 1.4;
+    margin-top: 0.25rem;
+}
+
+/* 按钮网格布局 */
+.button-grid[data-v-3eeafad5] {
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 23.4375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3.75rem;
+}
+.grid-row[data-v-3eeafad5] {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 3.125rem;
+    box-sizing: border-box;
+}
+.action-item[data-v-3eeafad5] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 3.75rem;
+}
+.action-text[data-v-3eeafad5] {
+    color: #fff;
+    font-size: 0.75rem;
+    margin-top: 0.375rem;
+    text-align: center;
+}
+
+/* 图标尺寸 */
+.call-xx[data-v-3eeafad5], .call-nz[data-v-3eeafad5] {
+    width: 1.875rem;
+    height: 1.875rem;
+}
+
+/* 挂断和接听按钮样式 */
+.call-end-btn[data-v-3eeafad5], .miui-action-dial[data-v-3eeafad5] {
+    width: 3.75rem;
+    height: 3.75rem;
+    border-radius: 1.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.call-end-btn[data-v-3eeafad5] {
+    background-color: #f7372d;
+    box-shadow: 0 0.125rem 0.375rem rgba(247, 55, 45, 0.3);
+}
+.miui-action-dial[data-v-3eeafad5] {
+    background-color: #4cd964;
+    box-shadow: 0 0.125rem 0.375rem rgba(76, 217, 100, 0.3);
+}
+.end-icon[data-v-3eeafad5], .miui-icon-call[data-v-3eeafad5] {
+    width: 1.5625rem;
+    height: 1.5625rem;
+}
+
+/* 移除旧的按钮布局样式 */
+.call-actions[data-v-3eeafad5], .bottom-actions[data-v-3eeafad5] {
+    display: none;
+}

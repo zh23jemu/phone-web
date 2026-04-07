@@ -1,0 +1,860 @@
+
+.miui-dial-page[data-v-19c976a0] {
+    background: #fff;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-overflow-scrolling: none;
+    transition: padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.miui-fixed-header[data-v-19c976a0] {
+    position: relative;
+    z-index: 2;
+}
+.miui-more-btn[data-v-19c976a0] {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    padding: 0.375rem 0 0;
+}
+.miui-dot[data-v-19c976a0] {
+    width: 0.25rem;
+    height: 0.25rem;
+    background: #888;
+    border-radius: 50%;
+    margin: 0.09375rem 0;
+}
+.miui-header-top[data-v-19c976a0] {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: calc(env(safe-area-inset-top) + 5rem) 0.9375rem 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.miui-title[data-v-19c976a0] {
+    font-size: clamp(1.5rem, 8vw, 1.875rem);
+    color: #222;
+    letter-spacing: 0.125rem;
+    margin-left: 0.75rem;
+    margin-bottom: clamp(1.25rem, 6vh, 1.5625rem);
+}
+.miui-tabbar[data-v-19c976a0] {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 0 0 0 0;
+}
+.miui-tab[data-v-19c976a0] {
+    font-size: 1rem;
+    color: #888;
+    margin-right: 1.5rem;
+    padding-bottom: 0.25rem;
+    position: relative;
+}
+.miui-tab.active[data-v-19c976a0] {
+    color: #1976ff;
+    font-weight: bold;
+}
+.miui-tab.active[data-v-19c976a0]::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0.1875rem;
+    background: #1976ff;
+    border-radius: 0.09375rem;
+}
+.miui-call-list[data-v-19c976a0] {
+    flex: 1;
+    padding: 0 1.25rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 1rem;
+    height: calc(100vh - 12.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    box-sizing: border-box;
+}
+.miui-call-item-wrapper[data-v-19c976a0] {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid #cacaca;
+}
+.miui-call-item[data-v-19c976a0] {
+    position: relative;
+    z-index: 2;
+    background: #fff;
+    transition: transform 0.3s ease, background-color 0.1s ease;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: clamp(0.625rem, 3vh, 0.875rem) 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.miui-call-item.active[data-v-19c976a0] {
+    background-color: #f5f5f5;
+}
+.miui-call-number[data-v-19c976a0] {
+    font-size: clamp(1rem, 5vw, 1.1875rem);
+    color: #222;
+    font-weight: normal;
+    margin-bottom: clamp(0.125rem, 1vh, 0.25rem);
+}
+.miui-call-location[data-v-19c976a0] {
+    font-size: clamp(0.625rem, 3vw, 0.6875rem);
+    color: #888;
+    opacity: 0.7;
+}
+.miui-call-side[data-v-19c976a0] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    min-width: 2.8125rem;
+}
+.miui-call-time[data-v-19c976a0] {
+    font-size: 0.6875rem;
+    color: #bbb;
+    margin-bottom: 0.25rem;
+    opacity: 0.6;
+}
+.miui-call-info[data-v-19c976a0] {
+    width: 1rem;
+    height: 1rem;
+    opacity: 0.7;
+}
+.miui-dialpad[data-v-19c976a0] {
+    position: fixed;
+    bottom: -3.75rem;
+    left: 0;
+    width: 100vw;
+    max-width: 29.6875rem;
+    margin-left: auto;
+    margin-right: auto;
+    background: #fafbfc;
+    border-radius: 1.25rem 1.25rem 0 0;
+    padding: 1.25rem 0 0 0;
+    box-shadow: 0 -0.0625rem 0.3125rem #eee;
+    padding-bottom: calc(3.75rem + env(safe-area-inset-bottom));
+    z-index: 9999;
+    overflow: hidden;
+    touch-action: none;
+    box-sizing: border-box;
+}
+.miui-dialpad.show[data-v-19c976a0] {
+    transform: translateY(0);
+}
+.miui-number-float[data-v-19c976a0] {
+    position: relative;
+    z-index: 999; /* Changed from 1 to 999 to be above dialpad-mask */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* pointer-events: none; */ /* Removed to allow clicking on search results */
+    padding-bottom: 0;
+    margin-top: 7.8125rem;
+}
+.miui-number-display[data-v-19c976a0] {
+    min-height: 3.125rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #222;
+    text-align: center;
+    margin: 1.25rem auto 0 auto;
+    letter-spacing: 0.0625rem;
+    font-family: inherit;
+    width: 100%;
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 500px;
+    touch-action: none;
+    padding-bottom: 0;
+    line-height: 1;
+}
+.miui-keypad[data-v-19c976a0] {
+    max-width: min(18.125rem, 80vw);
+    height: min(14.375rem, 60vw);
+    width: 100%;
+    margin: clamp(0.5rem, 2vw, 0.625rem) auto 2.5rem;
+    display: grid;
+    grid-template-rows: repeat(4, 1fr);
+    gap: 1rem;
+    padding: 0.75rem 0;
+    box-sizing: border-box;
+    transform: translateX(-0.5625rem); /* 整体向左移动 */
+}
+.miui-dial-actions[data-v-19c976a0] {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    max-width: min(18.125rem, 80vw);
+    width: 100%;
+    margin: 1rem auto;
+    padding: 0 1.25rem;
+    height: 3.75rem;
+    box-sizing: border-box;
+    gap: 1.5rem;
+}
+.miui-key-row[data-v-19c976a0] {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0 1.25rem;
+    height: min(3.125rem, 13vw) !important;
+    min-height: min(3.125rem, 13vw) !important;
+    max-height: min(3.125rem, 13vw) !important;
+    align-items: center;
+    justify-items: center;
+    box-sizing: border-box;
+}
+.miui-key[data-v-19c976a0] {
+    width: min(4.6875rem, 20vw) !important;
+    height: min(4.6875rem, 20vw) !important;
+    min-width: min(4.6875rem, 20vw) !important;
+    min-height: min(4.6875rem, 20vw) !important;
+    max-width: min(4.6875rem, 20vw) !important;
+    max-height: min(4.6875rem, 20vw) !important;
+    aspect-ratio: 1 !important;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1rem, 4vw, 1.625rem);
+    color: #222;
+    position: relative;
+    font-family: inherit;
+    transition: all 0.1s ease;
+    -webkit-user-select: none;
+            user-select: none;
+    padding: 0;
+    gap: 0;
+    margin: 0 auto; /* 修改为水平居中 */
+    flex: 0 0 min(4.6875rem, 20vw) !important;
+    box-shadow: none;
+}
+.miui-key[data-v-19c976a0]:active {
+    background: rgba(0, 0, 0, 0.05);
+    transform: scale(0.95);
+}
+.miui-key-main[data-v-19c976a0] {
+    font-size: clamp(2rem, 7vw, 2.25rem);
+    font-family: inherit;
+    font-weight: 600;
+    line-height: 1;
+    z-index: 1;
+    height: clamp(2.25rem, 9vw, 2.75rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+    position: relative;
+    width: 100%;
+    text-align: center;
+    padding-top: 0.625rem;
+}
+.miui-key-main[data-v-19c976a0]:active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200%;
+    height: 200%;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+.miui-key-sub[data-v-19c976a0] {
+    font-size: clamp(0.625rem, 2.5vw, 0.875rem);
+    color: #b0b0b0;
+    line-height: 1;
+    font-family: inherit;
+    font-weight: 500;
+    z-index: 1;
+    height: clamp(0.625rem, 2.5vw, 0.875rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 2.5rem;
+    margin-top: -0.125rem;
+    width: 100%;
+    text-align: center;
+}
+
+/* 为 * 键添加特殊样式 */
+.miui-key-row:last-child .miui-key:first-child .miui-key-sub[data-v-19c976a0] {
+    margin-top: -0.625rem;
+}
+.miui-key-sub[src][data-v-19c976a0] {
+    width: 1.75rem;
+    height: 1rem;
+    object-fit: contain;
+}
+.miui-action-side[data-v-19c976a0],
+.miui-action-dial[data-v-19c976a0],
+.miui-action-backspace[data-v-19c976a0] {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.miui-action-side[data-v-19c976a0] {
+    opacity: 0.7;
+    height: 3.125rem;
+    display: flex;
+    justify-content: center; /* 居中对齐 */
+}
+.miui-side-icon[data-v-19c976a0] {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+.miui-action-dial[data-v-19c976a0] {
+    height: 3.75rem !important;
+    width: 3.75rem !important;
+    min-width: 3.75rem !important;
+    min-height: 3.75rem !important;
+    max-width: 3.75rem !important;
+    max-height: 3.75rem !important;
+    aspect-ratio: 1 !important;
+    background: #21b34b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0.125rem 0.5rem rgba(33, 179, 75, 0.25);
+    transition: all 0.1s ease;
+    margin: 0 auto;
+    position: relative;
+}
+.miui-action-dial[data-v-19c976a0]:active {
+    background: #4cc56b;
+    transform: scale(0.95);
+    box-shadow: 0 0 0.9375rem rgba(33, 179, 75, 0.4);
+}
+.miui-action-backspace[data-v-19c976a0] {
+    height: 3.125rem !important;
+    width: 3.125rem !important;
+    min-width: 3.125rem !important;
+    min-height: 3.125rem !important;
+    max-width: 3.125rem !important;
+    max-height: 3.125rem !important;
+    aspect-ratio: 1 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: all 0.1s ease;
+    border-radius: 50%;
+    background: transparent;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+.miui-action-backspace[data-v-19c976a0]:active {
+    background: rgba(0, 0, 0, 0.05);
+    transform: scale(0.95);
+    opacity: 1;
+    box-shadow: 0 0 0.9375rem rgba(0, 0, 0, 0.2);
+}
+.miui-icon-backspace[data-v-19c976a0] {
+    width: 2rem;
+    height: 2rem;
+    z-index: 1;
+}
+.miui-icon-call[data-v-19c976a0] {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+.miui-more-popup[data-v-19c976a0] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+}
+.miui-more-mask[data-v-19c976a0] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+}
+.miui-more-menu[data-v-19c976a0] {
+    position: absolute;
+    top: 2.8125rem;
+    right: 1rem;
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.75rem rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    min-width: 5rem;
+    z-index: 1000;
+}
+.miui-more-item[data-v-19c976a0] {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    color: #222;
+    border-bottom: 1px solid #f0f0f0;
+}
+.miui-more-item[data-v-19c976a0]:last-child {
+    border-bottom: none;
+}
+.miui-number-location[data-v-19c976a0] {
+    text-align: center;
+    margin: -0.25rem 0 0 0;
+    padding: 0;
+    line-height: 1;
+}
+.miui-number-location-text[data-v-19c976a0] {
+    display: block;
+    color: #686868;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.125rem;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    touch-action: none;
+    line-height: 1;
+}
+.miui-dialpad-fab[data-v-19c976a0] {
+    position: fixed;
+    bottom: calc(5rem + env(safe-area-inset-bottom));
+    right: clamp(0.9375rem, 4vw, 1.25rem);
+    width: clamp(3.125rem, 15vw, 3.75rem);
+    height: clamp(3.125rem, 15vw, 3.75rem);
+    background: #21b34b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0.125rem 0.5rem #b6eec2;
+    z-index: 1000;
+}
+.miui-delete-btn[data-v-19c976a0] {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 3.75rem;
+    background: #ff3b30;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    z-index: 1;
+}
+.miui-call-main[data-v-19c976a0] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.mmi-error-overlay[data-v-19c976a0] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    z-index: 10001;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+.mmi-error-overlay.show[data-v-19c976a0] {
+    opacity: 1;
+    pointer-events: auto;
+}
+.mmi-error-dialog[data-v-19c976a0] {
+    background: #fff;
+    border-radius: 1.875rem;
+    width: 95%;
+    max-width: 21.875rem;
+    min-height: 3.125rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0;
+    z-index: 10002;
+    position: absolute;
+    bottom: 0.9375rem;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.mmi-error-dialog.show[data-v-19c976a0] {
+    transform: translate(-50%, 0);
+}
+.mmi-error-message[data-v-19c976a0] {
+    padding: 0.9375rem;
+    font-size: 1rem;
+    color: #333;
+    text-align: center;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+.mmi-error-button-container[data-v-19c976a0] {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0.625rem 0;
+}
+.mmi-error-button[data-v-19c976a0] {
+    font-size: 1.125rem;
+    color: #007aff;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.3125rem;
+    transition: background-color 0.2s ease;
+}
+.mmi-error-button[data-v-19c976a0]:active {
+    background-color: rgba(0, 122, 255, 0.1);
+}
+.missed-call[data-v-19c976a0] {
+    color: #ff3b30 !important;
+    font-weight: normal !important;
+}
+.batch-delete-btn[data-v-19c976a0] {
+    position: absolute;
+    top: 1.25rem;
+    right: 3.75rem;
+    display: flex;
+    align-items: center;
+    padding: 0.3125rem 0.625rem;
+    background: #f5f5f5;
+    border-radius: 0.9375rem;
+    z-index: 20;
+}
+.batch-delete-icon[data-v-19c976a0] {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.25rem;
+}
+.batch-delete-btn uni-text[data-v-19c976a0] {
+    font-size: 0.75rem;
+    color: #666;
+}
+.miui-batch-loading[data-v-19c976a0],
+.miui-batch-nomore[data-v-19c976a0] {
+    text-align: center;
+    color: #999;
+    font-size: 0.8125rem;
+    padding: 0.75rem 0;
+}
+.dialpad-mask[data-v-19c976a0] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    z-index: 998;
+    touch-action: none;
+    pointer-events: auto;
+}
+.miui-dialpad[data-v-19c976a0] {
+    z-index: 1000;
+}
+.miui-dialpad-fab[data-v-19c976a0] {
+    z-index: 1000;
+}
+.miui-dialpad[data-v-19c976a0] {
+    background: #fafbfc;
+    border-radius: 1.25rem 1.25rem 0 0;
+    box-shadow: 0 -0.0625rem 0.3125rem rgba(0, 0, 0, 0.1);
+}
+.miui-top-content[data-v-19c976a0],
+.miui-smart-dialing[data-v-19c976a0],
+.miui-number-float[data-v-19c976a0] {
+    position: relative;
+    z-index: 1;
+}
+.longpress-dialog-overlay[data-v-19c976a0] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    z-index: 10003;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+.longpress-dialog-overlay.show[data-v-19c976a0] {
+    opacity: 1;
+    pointer-events: auto;
+}
+.longpress-dialog[data-v-19c976a0] {
+    background: #fff;
+    border-radius: 1.875rem;
+    width: 95%;
+    max-width: 21.875rem;
+    min-height: 4.6875rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0;
+    z-index: 10004;
+    position: absolute;
+    bottom: 0.9375rem;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.longpress-dialog.show[data-v-19c976a0] {
+    transform: translate(-50%, 0);
+}
+.longpress-dialog-title[data-v-19c976a0] {
+    font-size: 1.875rem;
+    color: #222;
+    font-weight: bold;
+    margin-bottom: 0;
+    margin-top: 1.25rem;
+}
+.longpress-dialog-message[data-v-19c976a0] {
+    padding: 0 1.25rem;
+    font-size: 0.875rem;
+    color: #333;
+    text-align: center;
+    line-height: 1.2;
+    white-space: pre-wrap;
+    margin-top: 0.625rem;
+}
+.longpress-dialog-button-container[data-v-19c976a0] {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0.625rem 0;
+    gap: 3.75rem;
+}
+.longpress-dialog-button[data-v-19c976a0] {
+    font-size: 1.125rem;
+    color: #007aff;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.3125rem;
+    transition: background-color 0.2s ease;
+}
+.longpress-dialog-button[data-v-19c976a0]:active {
+    background-color: rgba(0, 122, 255, 0.1);
+}
+.miui-search-results[data-v-19c976a0] {
+    width: 100%;
+    z-index: 1001;
+    max-height: 18.75rem;
+    overflow-y: auto;
+    margin-top: 0.625rem;
+    background: #fff;
+}
+.miui-search-item-wrapper[data-v-19c976a0] {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid #cacaca;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    width: calc(100% - 2rem);
+}
+.miui-search-item-wrapper[data-v-19c976a0]:last-child {
+    border-bottom: none;
+}
+.miui-search-results .miui-call-item[data-v-19c976a0] {
+    padding: clamp(0.625rem, 3vh, 0.875rem) 0;
+    width: 100%;
+    box-sizing: border-box;
+    gap: 1.25rem; /* 增加手机号和时间的间距 */
+}
+.miui-search-results .miui-call-item > uni-view[data-v-19c976a0]:first-child {
+    flex: 1;
+    margin-right: 1.25rem; /* 增加左侧内容和右侧时间的间距 */
+}
+
+/* 为搜索记录中的时间和归属地添加淡化处理 */
+.miui-search-results .miui-call-location[data-v-19c976a0] {
+    opacity: 0.7;
+}
+.miui-search-results .miui-call-time[data-v-19c976a0] {
+    opacity: 0.6;
+}
+
+
+
+.no-scroll,
+.no-scroll body,
+.no-scroll html {
+    overflow: hidden !important;
+    touch-action: none !important;
+}
+.show-longpress-dialog {
+    overflow: hidden !important;
+    touch-action: none !important;
+}
+.mock-tabbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(3.125rem + env(safe-area-inset-bottom));
+    background-color: #fff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 0.03125rem solid #eee;
+    z-index: 9999;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+.mock-tabbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3125rem;
+    flex: 1;
+}
+.mock-tabbar-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+.mock-tabbar-text {
+    font-size: 0.75rem;
+    color: #888;
+}
+:root:not(.show-tabbar) .mock-tabbar,
+.mock-tabbar.show {
+    display: none;
+}
+.miui-smart-dialing {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: clamp(1.875rem, 10vh, 2.5rem) 1.25rem;
+    text-align: left;
+    color: #888;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    justify-content: flex-start;
+    padding-top: clamp(6.25rem, 30vh, 7.8125rem);
+    z-index: 999;
+    pointer-events: auto;
+    background: #fff;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-overflow-scrolling: none;
+    box-sizing: border-box;
+}
+.miui-smart-dialing-title {
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+    margin-bottom: clamp(0.75rem, 4vh, 1rem);
+}
+.miui-smart-dialing-text {
+    font-size: clamp(1rem, 5vw, 1.25rem);
+    margin-bottom: clamp(1.5rem, 7vh, 1.75rem);
+    line-height: 1.6;
+}
+.miui-smart-dialing-example {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+.miui-smart-dialing-key {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 4.375rem;
+    height: 4.375rem;
+    border-radius: 0.5rem;
+    background-color: #f0f0f0;
+    color: #222;
+    font-weight: bold;
+}
+.miui-smart-dialing-plus {
+    font-size: 1.75rem;
+    color: #888;
+}
+.miui-smart-dialing-title,
+.miui-smart-dialing-text,
+.miui-smart-dialing-example {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.miui-dial-page {
+    transition: padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.mmi-error-dialog,
+.mmi-error-overlay {
+    will-change: auto;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    perspective: none;
+    -webkit-perspective: none;
+}
+.mmi-error-dialog {
+    transform: translate(-50%, 0);
+    transition: none;
+}
+.mmi-error-overlay {
+    opacity: 1;
+    transition: none;
+}
+.mmi-error-dialog.show {
+    transform: translate(-50%, 0);
+}
+.mmi-error-overlay.show {
+    opacity: 1;
+}
+:root:not(.show-tabbar) .mock-tabbar {
+    z-index: 9999;
+}
+
+/* 为最后一行的 0 键添加特殊样式 */
+.miui-key-row:last-child {
+    padding: 0 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+.miui-key-row:last-child .miui-key:nth-child(2) {
+    margin: 0 auto;
+    width: min(4.6875rem, 20vw) !important;
+    height: min(4.6875rem, 20vw) !important;
+}

@@ -1,0 +1,61 @@
+{
+	"pages": [
+		{
+			"path" : "pages/message/message",
+			"style" : {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/auth/login",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path" : "pages/message/new-message",
+			"style" : 
+			{
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path" : "pages/message/chat",
+			"style" : 
+			{
+				"navigationStyle": "custom"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "仿真电话",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+			"background": "#efeff4"
+		}
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#4CD964",
+		"borderStyle": "white",
+		"backgroundColor": "#fff",
+		"list": [{
+			"pagePath": "pages/dial/dial",
+			"iconPath": "/static/icons/phone.png",
+			"selectedIconPath": "/static/icons/s_phone.png",
+			"text": "电话"
+		}, {
+			"pagePath": "pages/contacts/contacts",
+			"iconPath": "/static/icons/lxr.png",
+			"selectedIconPath": "/static/icons/s_lxr.png",
+			"text": "联系人"
+		}, {
+			"pagePath": "pages/favorite/favorite",
+			"iconPath": "/static/icons/sc.png",
+			"selectedIconPath": "/static/icons/s_sc.png",
+			"text": "收藏"
+		}]
+	}
+}

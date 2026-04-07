@@ -1,0 +1,257 @@
+
+.call-record-page[data-v-b199a24f] {
+    min-height: 100vh;
+    background: #ffffff; /* White background */
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    box-sizing: border-box;
+}
+.top-blue-card[data-v-b199a24f] {
+    background: #4d8cff;
+    border-radius: 1rem;
+    margin: 1.25rem 0.75rem 1rem 0.75rem;
+    padding: 1.125rem 0.75rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+.left-btns[data-v-b199a24f],
+.right-btns[data-v-b199a24f] {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.625rem;
+}
+.left-btns[data-v-b199a24f] {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1rem;
+}
+.left-btns .side-btn[data-v-b199a24f] {
+    min-width: 5rem;
+    width: 5rem;
+}
+.right-btns[data-v-b199a24f] {
+    align-items: flex-end;
+}
+.side-btn[data-v-b199a24f] {
+    background: #ffffff; /* White background */
+    color: #333; /* Dark text for white background */
+    font-size: 0.8125rem;
+    border-radius: 1.25rem;
+    padding: 0.5rem 1.25rem;
+    margin-bottom: 0;
+    min-width: 3.75rem;
+    text-align: center;
+}
+.center-title[data-v-b199a24f] {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.main-title[data-v-b199a24f] {
+    color: #fff;
+    font-size: 1.1875rem;
+    font-weight: 500;
+    text-align: center;
+}
+.ws-status[data-v-b199a24f],
+.message-status[data-v-b199a24f] {
+    color: #333; /* Dark text for white background */
+    font-size: 0.75rem;
+    text-align: center;
+    margin-top: 0.625rem;
+}
+.record-list[data-v-b199a24f] {
+    margin-top: 1rem;
+    padding: 0 0.75rem;
+    background: #ffffff; /* White background for the list area */
+}
+.real-time-call[data-v-b199a24f] {
+    border: 0.0625rem solid #4d8cff;
+    border-radius: 0.5rem;
+    margin: 1rem 0.75rem;
+    padding: 0;
+    background-color: #ffffff;
+}
+.real-time-call .record-item[data-v-b199a24f] {
+    border-bottom: none;
+    padding: 0.75rem;
+}
+.history-records[data-v-b199a24f] {
+    margin-top: 0;
+    /* 历史记录列表紧随实时呼叫区域 */
+}
+.record-item[data-v-b199a24f] {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.625rem 0.75rem;
+    border-bottom: 0.03125rem solid #333;
+    background-color: #ebe5e5f1; /* Slightly different background for items */
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+    border: 0.03125rem solid #333; /* Subtle border */
+}
+.call-icon[data-v-b199a24f] {
+    width: 3.125rem;
+    height: 3.125rem;
+    margin-right: 0.75rem;
+    border-radius: 0.5rem;
+    background: #ccc;
+}
+.record-info[data-v-b199a24f] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.number[data-v-b199a24f] {
+    color: #333; /* Darker text color for white background */
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+.location[data-v-b199a24f] {
+    color: #555; /* Darker text color */
+    font-size: 0.8125rem;
+    margin-bottom: 0.25rem;
+}
+.time-status[data-v-b199a24f] {
+    color: #777; /* Darker text color */
+    font-size: 0.6875rem;
+}
+.record-btns[data-v-b199a24f] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-left: 0.75rem;
+}
+.btn[data-v-b199a24f] {
+    border-radius: 0.5rem;
+    color: #fff;
+    font-size: 0.8125rem;
+    padding: 0.375rem 1rem;
+    text-align: center;
+    font-weight: 500;
+}
+.accept[data-v-b199a24f] {
+    background: #19c37c;
+}
+.reject[data-v-b199a24f] {
+    background: #ffb300;
+}
+.mark[data-v-b199a24f] {
+    background: #ff3b30;
+}
+
+/* Add styles for different mark types */
+.record-item.mark-normal[data-v-b199a24f] {
+    background-color: rgba(255, 0, 0, 0.4); /* Increased opacity */
+}
+.record-item.mark-transfer[data-v-b199a24f] {
+    background-color: rgba(255, 255, 0, 0.4); /* Increased opacity */
+}
+.record-item.mark-internal[data-v-b199a24f] {
+    background-color: rgba(0, 128, 0, 0.4); /* Increased opacity */
+}
+
+/* 标记弹窗样式 */
+.mark-modal[data-v-b199a24f] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 确保弹窗在最上层 */
+}
+.modal-content[data-v-b199a24f] {
+    background-color: #ffffff; /* Change to white background */
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    width: 80vw;
+    max-width: 18.75rem;
+    text-align: center;
+    color: #333333; /* Change text color to dark for white background */
+    box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.1);
+}
+.modal-title[data-v-b199a24f] {
+    font-size: 1.0625rem;
+    font-weight: bold;
+    margin-bottom: 1.25rem;
+}
+.mark-options[data-v-b199a24f] {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.9375rem; /* Add space between options */
+    margin-bottom: 1.25rem;
+}
+.option-item[data-v-b199a24f] {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.625rem;
+    font-size: 0.9375rem;
+}
+.radio-icon[data-v-b199a24f] {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 0.0625rem solid #999;
+    border-radius: 50%;
+    margin-right: 0.625rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+.radio-icon.checked[data-v-b199a24f] {
+    border-color: #4d8cff;
+    background-color: #4d8cff;
+}
+.radio-icon.checked[data-v-b199a24f]::after {
+    content: '';
+    width: 0.625rem;
+    height: 0.625rem;
+    background-color: #fff;
+    border-radius: 50%;
+}
+.modal-actions[data-v-b199a24f] {
+    display: flex;
+    justify-content: center;
+    gap: 4.15625rem; /* Increase space between buttons */
+}
+.action-btn[data-v-b199a24f] {
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.9375rem;
+    cursor: pointer;
+}
+.cancel[data-v-b199a24f] {
+    border: 0.03125rem solid #cccccc; /* Lighter border */
+    color: #666666; /* Darker text */
+    background-color: #f0f0f0; /* Light background for cancel */
+}
+.confirm[data-v-b199a24f] {
+    background-color: #4d8cff;
+    color: #fff;
+}
+.real-time-call .record-info .number[data-v-b199a24f] {
+    color: #333; /* Dark text for white background */
+}
+.real-time-call .record-info .location[data-v-b199a24f] {
+    color: #555; /* Dark text */
+}
+.real-time-call .record-info .time-status[data-v-b199a24f] {
+    color: #777; /* Dark text */
+}
