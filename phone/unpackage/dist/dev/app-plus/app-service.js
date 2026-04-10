@@ -5354,17 +5354,17 @@ if (uni.restoreGlobal) {
   __definePage("pages/message/message", PagesMessageMessage);
   const _sfc_main = {
     onLaunch: function() {
-      formatAppLog("warn", "at App.vue:5", "当前组件仅支持 uni_modules 目录结构 ，请升级 HBuilderX 到 3.1.0 版本以上！");
-      formatAppLog("log", "at App.vue:6", "App Launch");
+      formatAppLog("warn", "at App.vue:8", "当前组件仅支持 uni_modules 目录结构 ，请升级 HBuilderX 到 3.1.0 版本以上！");
+      formatAppLog("log", "at App.vue:9", "App Launch");
       const userId = uni.getStorageSync("userId");
       const authToken = uni.getStorageSync("authToken");
       if (userId || authToken) {
-        formatAppLog("log", "at App.vue:13", "Found user credentials in local storage, proceeding to main page.");
+        formatAppLog("log", "at App.vue:16", "Found user credentials in local storage, proceeding to main page.");
         uni.reLaunch({
           url: "/pages/dial/dial"
         });
       } else {
-        formatAppLog("log", "at App.vue:20", "No user credentials found, redirecting to login page.");
+        formatAppLog("log", "at App.vue:23", "No user credentials found, redirecting to login page.");
         uni.reLaunch({
           url: "/pages/auth/login"
         });
@@ -5374,10 +5374,10 @@ if (uni.restoreGlobal) {
       }, 2e3);
     },
     onShow: function() {
-      formatAppLog("log", "at App.vue:33", "App Show");
+      formatAppLog("log", "at App.vue:36", "App Show");
     },
     onHide: function() {
-      formatAppLog("log", "at App.vue:36", "App Hide");
+      formatAppLog("log", "at App.vue:39", "App Hide");
     },
     methods: {
       async preloadBackground() {
@@ -5386,17 +5386,17 @@ if (uni.restoreGlobal) {
           const cacheTime = uni.getStorageSync("background_cache_time");
           const now = Date.now();
           if (cachedBg && cacheTime && now - cacheTime < 24 * 60 * 60 * 1e3) {
-            formatAppLog("log", "at App.vue:48", "Using cached background");
+            formatAppLog("log", "at App.vue:56", "Using cached background");
             return;
           }
           const ret = u7746wallpaper.getBackground("test.png");
           if (ret.code === "1") {
             uni.setStorageSync("cached_background", ret.msg);
             uni.setStorageSync("background_cache_time", now);
-            formatAppLog("log", "at App.vue:57", "Background cached successfully");
+            formatAppLog("log", "at App.vue:65", "Background cached successfully");
           }
         } catch (error2) {
-          formatAppLog("error", "at App.vue:60", "Error preloading background:", error2);
+          formatAppLog("error", "at App.vue:68", "Error preloading background:", error2);
         }
       }
     }

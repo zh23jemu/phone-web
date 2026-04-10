@@ -8,6 +8,7 @@ import http.server
 import socketserver
 import threading
 import urllib.parse
+import os
 from http import HTTPStatus
 import websockets.protocol
 import re
@@ -15,10 +16,11 @@ import requests
 
 # --- 数据库配置 ---
 db_config = {
-    'host': 'localhost',  # 您的数据库主机
-    'user': 'phone',      # 您的数据库用户名
-    'password': 'phone2025',  # 您的数据库密码
-    'database': 'phone'   # 您的数据库名称
+    'host': os.getenv('PHONE_DB_HOST', 'localhost'),
+    'port': int(os.getenv('PHONE_DB_PORT', '3306')),
+    'user': os.getenv('PHONE_DB_USER', 'phone'),
+    'password': os.getenv('PHONE_DB_PASSWORD', 'phone2025'),
+    'database': os.getenv('PHONE_DB_NAME', 'phone')
 }
 
 # --- 内存中的状态管理 ---
@@ -2081,6 +2083,29 @@ class CallRecordsHTTPHandler(http.server.BaseHTTPRequestHandler):
                 close_db_connection(conn)
             return
         
+        elif parsed_url.path == '/api/contacts':
+            conn = get_db_connection()
+            if not conn:
+                self.send_error_response('Database connection failed')
+                return
+
+            try:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute("""
+                    SELECT id, user_id, phone, name
+                    FROM `la_contacts`
+                    ORDER BY id ASC
+                """)
+                contacts = cursor.fetchall()
+                self.send_success_response(contacts)
+            except mysql.connector.Error as err:
+                print(f"Database error fetching contacts: {err}")
+                self.send_error_response('Failed to fetch contacts')
+            finally:
+                cursor.close()
+                close_db_connection(conn)
+            return
+
         elif parsed_url.path == '/api/phone-location':
             # 解析查询参数
             query_params = urllib.parse.parse_qs(parsed_url.query)
@@ -2350,7 +2375,7 @@ class CallRecordsHTTPHandler(http.server.BaseHTTPRequestHandler):
 # --- 启动服务器 ---
 async def main():
     # 启动 WebSocket 服务器 (保持在 9096 端口)
-    websocket_port = 9096
+    websocket_port = int(os.getenv('PHONE_WS_PORT', '9096'))
     try:
         ws_server = await websockets.serve(websocket_handler, "0.0.0.0", websocket_port)
         print(f"WebSocket server started on port {websocket_port}")
@@ -2359,7 +2384,7 @@ async def main():
         return  # 如果WebSocket服务器启动失败，直接退出
 
     # 启动 HTTP 服务器
-    http_port = 9097
+    http_port = int(os.getenv('PHONE_HTTP_PORT', '9097'))
     try:
         # 创建自定义的HTTP服务器类
         class ThreadedHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):

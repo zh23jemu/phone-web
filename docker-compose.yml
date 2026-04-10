@@ -1,0 +1,77 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: phone-web-mysql
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "13306:3306"
+    volumes:
+      - phone_web_mysql:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: phone-web-redis
+    ports:
+      - "16379:6379"
+    volumes:
+      - phone_web_redis:/data
+
+  phone-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.phone-api
+    container_name: phone-web-phone-api
+    profiles:
+      - full
+    environment:
+      PHONE_DB_HOST: mysql
+      PHONE_DB_PORT: 3306
+      PHONE_DB_USER: phone
+      PHONE_DB_PASSWORD: phone2025
+      PHONE_DB_NAME: phone
+      PHONE_WS_PORT: 9096
+      PHONE_HTTP_PORT: 9097
+    ports:
+      - "9096:9096"
+      - "9097:9097"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  likeadmin-php:
+    image: registry.cn-guangzhou.aliyuncs.com/likeadmin/php:8.0.30.3-fpm
+    container_name: likeadmin-php
+    working_dir: /likeadmin_php/server
+    volumes:
+      - ./likeadmin_php-master/server:/likeadmin_php/server
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  likeadmin-nginx:
+    image: registry.cn-guangzhou.aliyuncs.com/likeadmin/nginx:1.23.1
+    container_name: likeadmin-nginx
+    ports:
+      - "2025:80"
+    volumes:
+      - ./likeadmin_php-master/server:/likeadmin_php/server
+      - ./docker/likeadmin-nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - likeadmin-php
+
+volumes:
+  phone_web_mysql:
+  phone_web_redis:

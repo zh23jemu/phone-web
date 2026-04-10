@@ -1,5 +1,8 @@
 <script>
+	// `u7746-wallpaper` 是原生端插件，Web/H5 不提供该模块。
+	// #ifdef APP-PLUS
 	import u7746wallpaper from '@/uni_modules/u7746-wallpaper';
+	// #endif
 	export default {
 		onLaunch: function() {
 			console.warn('当前组件仅支持 uni_modules 目录结构 ，请升级 HBuilderX 到 3.1.0 版本以上！')
@@ -38,6 +41,11 @@
 		methods: {
 			async preloadBackground() {
 				try {
+					// 非 App 端直接跳过原生壁纸预加载。
+					// #ifndef APP-PLUS
+					return;
+					// #endif
+
 					// 先检查缓存
 					const cachedBg = uni.getStorageSync('cached_background');
 					const cacheTime = uni.getStorageSync('background_cache_time');
