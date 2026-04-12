@@ -62,10 +62,15 @@ class BaseValidate extends Validate
     public function goCheck($scene = null, array $validateData = []): array
     {
         //接收参数
+        $request = request();
         if ($this->method == 'GET') {
-            $params = request()->get();
+            $params = $request->get();
         } else {
-            $params = request()->post();
+            $params = $request->post();
+            if (empty($params) && $request->isJson()) {
+                // 兼容 application/json 请求体
+                $params = $request->param();
+            }
         }
         //合并验证参数
         $params = array_merge($params, $validateData);

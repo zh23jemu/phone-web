@@ -29,12 +29,19 @@ class UserValidate extends BaseValidate
         'id' => 'require|checkUser',
         'field' => 'require|checkField',
         'value' => 'require',
+        'nickname' => 'require',
+        'account' => 'require|checkAccount',
+        'password' => 'require',
+        'mobile' => 'checkMobile',
     ];
 
     protected $message = [
         'id.require' => '请选择用户',
         'field.require' => '请选择操作',
         'value.require' => '请输入内容',
+        'nickname.require' => '请输入用户昵称',
+        'account.require' => '请输入用户账号',
+        'password.require' => '请输入用户密码',
     ];
 
 
@@ -45,6 +52,39 @@ class UserValidate extends BaseValidate
      * @date 2022/9/22 16:35
      */
     public function sceneDetail()
+    {
+        return $this->only(['id']);
+    }
+
+    /**
+     * @notes 添加场景
+     * @return UserValidate
+     * @author 段誉
+     * @date 2024/4/11 10:00
+     */
+    public function sceneAdd()
+    {
+        return $this->only(['nickname', 'account', 'password', 'mobile']);
+    }
+
+    /**
+     * @notes 编辑场景
+     * @return UserValidate
+     * @author 段誉
+     * @date 2024/4/11 10:00
+     */
+    public function sceneEdit()
+    {
+        return $this->only(['id', 'nickname', 'account', 'password', 'mobile']);
+    }
+
+    /**
+     * @notes 删除场景
+     * @return UserValidate
+     * @author 段誉
+     * @date 2024/4/11 10:00
+     */
+    public function sceneDelete()
     {
         return $this->only(['id']);
     }
@@ -120,6 +160,61 @@ class UserValidate extends BaseValidate
                     return '手机号码已存在';
                 }
                 break;
+        }
+        return true;
+    }
+
+
+    /**
+     * @notes 校验账号唯一
+     * @param $value
+     * @param $rule
+     * @param $data
+     * @return bool|string
+     * @author 段誉
+     * @date 2024/4/11 10:00
+     */
+    public function checkAccount($value, $rule, $data)
+    {
+        $where = [['account', '=', $value]];
+        if (!empty($data['id'])) {
+            $where[] = ['id', '<>', $data['id']];
+        }
+        $account = User::where($where)->findOrEmpty();
+        if (!$account->isEmpty()) {
+            return '账号已被使用';
+        }
+        return true;
+    }
+
+
+    /**
+     * @notes 校验手机号唯一
+     * @param $value
+     * @param $rule
+     * @param $data
+     * @return bool|string
+     * @author 段誉
+     * @date 2024/4/11 10:00
+     */
+    public function checkMobile($value, $rule, $data)
+    {
+        if (empty($value)) {
+            return true;
+        }
+
+        if (false == $this->validate($value, 'mobile', $data)) {
+            return '手机号码格式错误';
+        }
+
+        $where = [['mobile', '=', $value]];
+        if (!empty($data['id'])) {
+            $where[] = ['id', '<>', $data['id']];
+        }
+
+        $mobile = User::where($where)->findOrEmpty();
+        if (!$mobile->isEmpty()) {
+            return '手机号码已存在';
         }
         return true;
     }

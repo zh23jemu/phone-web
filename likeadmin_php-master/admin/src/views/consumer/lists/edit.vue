@@ -181,7 +181,7 @@ const open = (type = 'add') => {
             nickname: '',
             account: '',
             password: '',
-            mobile: '18888888888',
+            mobile: '',
             sex: '1',
             channel: '1',
             is_disable: '0',

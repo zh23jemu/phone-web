@@ -13,11 +13,14 @@
 // +----------------------------------------------------------------------
 namespace app\adminapi\logic\user;
 
+use app\common\service\FileService;
 use app\common\enum\user\AccountLogEnum;
+use app\common\enum\user\UserEnum;
 use app\common\enum\user\UserTerminalEnum;
 use app\common\logic\AccountLogLogic;
 use app\common\logic\BaseLogic;
 use app\common\model\user\User;
+use think\facade\Config;
 use think\facade\Db;
 
 /**
@@ -65,6 +68,140 @@ class UserLogic extends BaseLogic
             'id' => $params['id'],
             $params['field'] => $params['value']
         ]);
+    }
+
+    /**
+     * @notes 添加用户
+     * @param array $params
+     * @return bool
+     */
+    public static function add(array $params): bool
+    {
+        Db::startTrans();
+        try {
+            $passwordSalt = Config::get('project.unique_identification');
+            $password = create_password($params['password'], $passwordSalt);
+            $defaultAvatar = config('project.default_image.user_avatar');
+            $avatar = !empty($params['avatar']) ? FileService::setFileUrl($params['avatar']) : $defaultAvatar;
+
+            $sn = $params['sn'] ?? '';
+            if (empty($sn) || User::where(['sn' => $sn])->find()) {
+                $sn = User::createUserSn();
+            }
+
+            User::create([
+                'sn' => $sn,
+                'avatar' => $avatar,
+                'real_name' => $params['real_name'] ?? '',
+                'nickname' => $params['nickname'],
+                'account' => $params['account'],
+                'password' => $password,
+                'mobile' => $params['mobile'] ?? '',
+                'sex' => self::normalizeEnumValue($params['sex'] ?? 0, UserEnum::getSexDesc()),
+                'channel' => self::normalizeEnumValue($params['channel'] ?? 0, UserTerminalEnum::getTermInalDesc()),
+                'is_disable' => $params['is_disable'] ?? 0,
+                'login_ip' => $params['login_ip'] ?? '',
+                'login_time' => $params['login_time'] ?? 0,
+                'is_new_user' => $params['is_new_user'] ?? 1,
+                'user_money' => $params['user_money'] ?? 0,
+                'total_recharge_amount' => $params['total_recharge_amount'] ?? 0,
+                'create_time' => time(),
+                'update_time' => time(),
+            ]);
+
+            Db::commit();
+            return true;
+        } catch (\Exception $e) {
+            Db::rollback();
+            self::setError($e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * @notes 编辑用户
+     * @param array $params
+     * @return bool
+     */
+    public static function edit(array $params): bool
+    {
+        Db::startTrans();
+        try {
+            if (!empty($params['field']) && array_key_exists('value', $params)) {
+                self::setUserInfo($params);
+                Db::commit();
+                return true;
+            }
+
+            $data = [
+                'id' => $params['id'],
+                'sn' => $params['sn'] ?? '',
+                'avatar' => !empty($params['avatar']) ? FileService::setFileUrl($params['avatar']) : '',
+                'real_name' => $params['real_name'] ?? '',
+                'nickname' => $params['nickname'],
+                'account' => $params['account'],
+                'mobile' => $params['mobile'] ?? '',
+                'sex' => self::normalizeEnumValue($params['sex'] ?? 0, UserEnum::getSexDesc()),
+                'channel' => self::normalizeEnumValue($params['channel'] ?? 0, UserTerminalEnum::getTermInalDesc()),
+                'is_disable' => $params['is_disable'] ?? 0,
+                'login_ip' => $params['login_ip'] ?? '',
+                'login_time' => $params['login_time'] ?? 0,
+                'is_new_user' => $params['is_new_user'] ?? 1,
+                'user_money' => $params['user_money'] ?? 0,
+                'total_recharge_amount' => $params['total_recharge_amount'] ?? 0,
+                'update_time' => time(),
+            ];
+
+            if (!empty($params['password'])) {
+                $passwordSalt = Config::get('project.unique_identification');
+                $data['password'] = create_password($params['password'], $passwordSalt);
+            }
+
+            User::update($data);
+            Db::commit();
+            return true;
+        } catch (\Exception $e) {
+            Db::rollback();
+            self::setError($e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * @notes 删除用户
+     * @param array $params
+     * @return bool
+     */
+    public static function delete(array $params): bool
+    {
+        try {
+            User::destroy($params['id']);
+            return true;
+        } catch (\Exception $e) {
+            self::setError($e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * @notes 兼容列表页展示文案回填到编辑表单后的枚举值
+     * @param mixed $value
+     * @param array $desc
+     * @param int $default
+     * @return int
+     */
+    private static function normalizeEnumValue($value, array $desc, int $default = 0): int
+    {
+        if (is_numeric($value)) {
+            return (int) $value;
+        }
+
+        if (is_string($value) && '' !== trim($value)) {
+            $valueMap = array_flip($desc);
+            return (int) ($valueMap[$value] ?? $default);
+        }
+
+        return $default;
     }
 
 

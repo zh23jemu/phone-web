@@ -60,6 +60,45 @@ class User extends BaseModel
         }
     }
 
+    /**
+     * @notes 搜索器-用户昵称
+     * @param $query
+     * @param $value
+     * @param $data
+     */
+    public function searchNicknameAttr($query, $value, $data)
+    {
+        if ($value !== '') {
+            $query->where('nickname', 'like', '%' . $value . '%');
+        }
+    }
+
+    /**
+     * @notes 搜索器-用户账号
+     * @param $query
+     * @param $value
+     * @param $data
+     */
+    public function searchAccountAttr($query, $value, $data)
+    {
+        if ($value !== '') {
+            $query->where('account', 'like', '%' . $value . '%');
+        }
+    }
+
+    /**
+     * @notes 搜索器-用户电话
+     * @param $query
+     * @param $value
+     * @param $data
+     */
+    public function searchMobileAttr($query, $value, $data)
+    {
+        if ($value !== '') {
+            $query->where('mobile', 'like', '%' . $value . '%');
+        }
+    }
+
 
     /**
      * @notes 搜索器-注册来源
