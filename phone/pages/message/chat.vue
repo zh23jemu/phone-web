@@ -118,7 +118,7 @@ export default {
         const cleanedPhone = this.phone.replace(/\s/g, '');
         console.log('Fetching messages with params:', { userId: this.userId, phone: cleanedPhone, page: this.page, pageSize: this.pageSize });
         const response = await uni.request({
-          url: 'http://106.53.30.150:9097/api/messages',
+          url: 'http://127.0.0.1:9097/api/messages',
           method: 'GET',
           data: {
             userId: this.userId,
@@ -196,7 +196,7 @@ export default {
         console.log('Sending message data to backend:', messageData);
 
         const response = await uni.request({
-          url: 'http://106.53.30.150:9097/api/send-message',
+          url: 'http://127.0.0.1:9097/api/send-message',
           method: 'POST',
           data: messageData
         });
@@ -232,7 +232,7 @@ export default {
     async handleDelete() {
       try {
         const response = await uni.request({
-          url: 'http://106.53.30.150:9097/api/delete-conversation',
+          url: 'http://127.0.0.1:9097/api/delete-conversation',
           method: 'POST',
           data: {
             userId: this.userId,
@@ -339,7 +339,7 @@ export default {
           return; // Keep the initial displayName if check cannot be performed
       }
       try {
-          const apiUrl = `http://106.53.30.150:9097/api/contact`;
+          const apiUrl = `http://127.0.0.1:9097/api/contact`;
           console.log('checkContactAndDisplay: Calling API:', apiUrl, 'with phone:', cleanedNumber);
           const res = await uni.request({
               url: apiUrl,

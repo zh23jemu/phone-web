@@ -144,7 +144,7 @@ export default {
            this.error = null;
            try {
                const response = await uni.request({
-                   url: 'http://106.53.30.150:9097/api/call-records',
+                   url: 'http://127.0.0.1:9097/api/call-records',
                    method: 'GET',
                    data: {
                        number: this.number.replace(/\s/g, ''),
@@ -257,7 +257,7 @@ export default {
                const callIds = this.callRecords.map(record => record.call_id);
                
                const response = await uni.request({
-                   url: 'http://106.53.30.150:9097/api/delete-call-record',
+                   url: 'http://127.0.0.1:9097/api/delete-call-record',
                    method: 'POST',
                    data: {
                        callId: callIds,

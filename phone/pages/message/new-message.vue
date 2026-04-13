@@ -51,7 +51,7 @@ export default {
 
       try {
         const response = await uni.request({
-          url: 'http://106.53.30.150:9097/api/send-message',
+          url: 'http://127.0.0.1:9097/api/send-message',
           method: 'POST',
           data: {
             senderId: this.userId,

@@ -49,7 +49,7 @@ export default {
 
       try {
         const response = await uni.request({
-          url: 'http://106.53.30.150:2025/api/login/account',
+          url: 'http://127.0.0.1:2025/api/login/account',
           method: 'POST',
           data: {
             account: this.account,
@@ -81,7 +81,7 @@ export default {
     },
     getUserInfo(token) {
       uni.request({
-        url: 'http://106.53.30.150:2025/api/user/center',
+        url: 'http://127.0.0.1:2025/api/user/center',
         method: 'GET',
         header: {
           'token': token // 在 header 中携带 token

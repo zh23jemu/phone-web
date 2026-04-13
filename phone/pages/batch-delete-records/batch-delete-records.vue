@@ -83,7 +83,7 @@ export default {
             this.isLoading = true;
             try {
                 const response = await uni.request({
-                    url: 'http://106.53.30.150:9097/api/call-records',
+                    url: 'http://127.0.0.1:9097/api/call-records',
                     method: 'GET',
                     data: {
                         userId: this.userId,
@@ -220,7 +220,7 @@ export default {
                 console.log('Sending delete request with IDs:', callIds);
 
                 const response = await uni.request({
-                    url: 'http://106.53.30.150:9097/api/delete-call-record',
+                    url: 'http://127.0.0.1:9097/api/delete-call-record',
                     method: 'POST',
                     data: {
                         callId: callIds

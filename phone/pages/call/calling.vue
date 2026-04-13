@@ -502,7 +502,7 @@
 		  
 			  try {
 				  const res = await uni.request({
-					  url: 'http://106.53.30.150:9097/api/dial',
+ 					  url: 'http://127.0.0.1:9097/api/dial',
 					  method: 'POST',
 					  data: {
 						  number: this.number.replace(/\s/g, ''),
@@ -572,7 +572,7 @@
 		      if (!this.callId) return;
 		      try {
 		          const res = await uni.request({
-		              url: `http://106.53.30.150:9097/api/call-status`,
+		              url: `http://127.0.0.1:9097/api/call-status`,
 		              method: 'GET',
 		              data: {
 		                  callId: this.callId
@@ -607,7 +607,7 @@
 		                          // 更新铃声状态为 false
 		                          try {
 		                              const ringtoneRes = await uni.request({
-		                                  url: 'http://106.53.30.150:9097/api/ringtone-status',
+		                                  url: 'http://127.0.0.1:9097/api/ringtone-status',
 		                                  method: 'POST',
 		                                  data: {
 		                                      userId: this.userId,
@@ -708,7 +708,7 @@
 		      try {
 		          console.log('Sending background hangup request for callId:', this.callId);
 		          const res = await uni.request({
-		              url: 'http://106.53.30.150:9097/api/hangup',
+		              url: 'http://127.0.0.1:9097/api/hangup',
 		              method: 'POST',
 		              data: {
 		                  callId: this.callId,
@@ -770,7 +770,7 @@
 		        // 更新服务器状态
 		        try {
 		            const res = await uni.request({
-		                url: 'http://106.53.30.150:9097/api/ringtone-status',
+		                url: 'http://127.0.0.1:9097/api/ringtone-status',
 		                method: 'POST',
 		                data: {
 		                    userId: this.userId,
@@ -861,7 +861,7 @@
 		    // 添加通知服务器的逻辑
 		    try {
 		        const res = await uni.request({
-		            url: 'http://106.53.30.150:9097/api/ringtone-status',
+		            url: 'http://127.0.0.1:9097/api/ringtone-status',
 		            method: 'POST',
 		            data: {
 		                userId: this.userId,
@@ -956,7 +956,7 @@
 		    }
 		    try {
 		        // Use POST method for the contact API as per server.py
-		        const apiUrl = `http://106.53.30.150:9097/api/contact`;
+		        const apiUrl = `http://127.0.0.1:9097/api/contact`;
 		        console.log('checkContactAndDisplay: Calling API:', apiUrl, 'with phone:', cleanedNumber);
 		        const res = await uni.request({
 		            url: apiUrl,
@@ -1014,7 +1014,7 @@
 
 		    try {
 		        const res = await uni.request({
-		            url: 'http://106.53.30.150:9097/api/ringtone-status',
+		            url: 'http://127.0.0.1:9097/api/ringtone-status',
 		            method: 'GET',
 		            data: {
 		                userId: this.userId
@@ -1107,7 +1107,7 @@
 				try {
 					const userId = uni.getStorageSync('userId') || 6;
 					const response = await uni.request({
-						url: 'http://106.53.30.150:9097/api/call-records',
+						url: 'http://127.0.0.1:9097/api/call-records',
 						method: 'GET',
 						data: {
 							userId: userId,
@@ -1439,5 +1439,4 @@
     }
 }
 </style>
-
 

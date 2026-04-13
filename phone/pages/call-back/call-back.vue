@@ -260,7 +260,7 @@
 		  
 			  try {
 				  const res = await uni.request({
-					  url: 'http://106.53.30.150:9097/api/dial',
+ 					  url: 'http://127.0.0.1:9097/api/dial',
 					  method: 'POST',
 					  data: {
 						  number: this.number.replace(/\s/g, ''),
@@ -322,7 +322,7 @@
 		      if (!this.callId) return;
 		      try {
 		          const res = await uni.request({
-		              url: `http://106.53.30.150:9097/api/call-status`,
+		              url: `http://127.0.0.1:9097/api/call-status`,
 		              method: 'GET',
 		              data: {
 		                  callId: this.callId
@@ -414,7 +414,7 @@
 			    // 如果有 callId，发送挂断请求
 				if (this.callId) {
 					uni.request({
-						url: 'http://106.53.30.150:9097/api/hangup',
+						url: 'http://127.0.0.1:9097/api/hangup',
 						method: 'POST',
 						data: {
 							callId: this.callId,
@@ -509,7 +509,7 @@
 		  async checkRingtoneStatus() {
 		    try {
 		        const res = await uni.request({
-		            url: 'http://106.53.30.150:9097/api/ringtone-status',
+		            url: 'http://127.0.0.1:9097/api/ringtone-status',
 		            method: 'GET',
 		            data: {
 		                userId: this.userId  // 添加用户ID参数
@@ -541,7 +541,7 @@
 		    }
 		    try {
 		        // 使用 POST 方法请求
-		        const apiUrl = `http://106.53.30.150:9097/api/contact`;
+		        const apiUrl = `http://127.0.0.1:9097/api/contact`;
 		        console.log('checkContactAndDisplay: Calling API:', apiUrl, 'with phone:', cleanedNumber);
 		        const res = await uni.request({
 		            url: apiUrl,
@@ -579,7 +579,7 @@
 		          // 更新铃声状态为false
 		          try {
 		              const res = await uni.request({
-		                  url: 'http://106.53.30.150:9097/api/ringtone-status',
+		                  url: 'http://127.0.0.1:9097/api/ringtone-status',
 		                  method: 'POST',
 		                  data: {
 		                      userId: this.userId,
@@ -599,7 +599,7 @@
 		          // 更新通话状态为 connected
 		          try {
 		              const statusRes = await uni.request({
-		                  url: 'http://106.53.30.150:9097/api/update-call-status',
+		                  url: 'http://127.0.0.1:9097/api/update-call-status',
 		                  method: 'POST',
 		                  data: {
 		                      callId: this.callId,
@@ -869,7 +869,6 @@
     display: none;
 }
 </style>
-
 
 
 

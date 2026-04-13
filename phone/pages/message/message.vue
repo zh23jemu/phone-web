@@ -71,7 +71,7 @@ export default {
       this.isLoading = true
       try {
         const response = await uni.request({
-          url: 'http://106.53.30.150:9097/api/conversations',
+          url: 'http://127.0.0.1:9097/api/conversations',
           method: 'GET',
           data: {
             userId: this.userId
@@ -136,7 +136,7 @@ export default {
 
         try {
           const response = await uni.request({
-            url: 'http://106.53.30.150:9097/api/delete-conversations',
+            url: 'http://127.0.0.1:9097/api/delete-conversations',
             method: 'POST',
             data: {
               userId: this.userId,
@@ -226,7 +226,7 @@ export default {
         try {
             console.log('Deleting conversation with phone:', phone);
             const response = await uni.request({
-                url: 'http://106.53.30.150:9097/api/delete-conversation',
+                url: 'http://127.0.0.1:9097/api/delete-conversation',
                 method: 'POST',
                 data: {
                     userId: this.userId,

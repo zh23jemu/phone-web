@@ -587,7 +587,7 @@ export default {
 			// 在跳转到通话页面之前，先将铃声状态设置为 false
 			try {
 				const res = await uni.request({
-					url: 'http://106.53.30.150:9097/api/ringtone-status',
+					url: 'http://127.0.0.1:9097/api/ringtone-status',
 					method: 'POST',
 					data: {
 						userId: this.userId,
@@ -722,7 +722,7 @@ export default {
 
 	            const userId = this.userId;
 	            const response = await uni.request({
-	                url: 'http://106.53.30.150:9097/api/call-records',
+	                url: 'http://127.0.0.1:9097/api/call-records',
 	                method: 'GET',
 	                data: {
 	                    userId: userId,
@@ -858,7 +858,7 @@ export default {
 	        try {
 	            console.log('Deleting record with ID:', callId);
 	            const res = await uni.request({
-	                url: 'http://106.53.30.150:9097/api/delete-call-record',
+	                url: 'http://127.0.0.1:9097/api/delete-call-record',
 	                method: 'POST',
 	                data: {
 	                    callId: callId
@@ -913,7 +913,7 @@ export default {
             }
             try {
                 const res = await uni.request({
-                    url: `http://106.53.30.150:9097/api/check-incoming-calls?userId=${this.userId}`,
+                    url: `http://127.0.0.1:9097/api/check-incoming-calls?userId=${this.userId}`,
                     method: 'GET'
                 });
 

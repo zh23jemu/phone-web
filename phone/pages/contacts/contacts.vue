@@ -31,7 +31,7 @@ export default {
         async fetchContacts() {
             try {
                 const response = await uni.request({
-                    url: `http://106.53.30.150:9097/api/contacts`,
+                    url: `http://127.0.0.1:9097/api/contacts`,
                     method: 'GET'
                 });
 
