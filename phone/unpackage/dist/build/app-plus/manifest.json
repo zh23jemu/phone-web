@@ -4,7 +4,7 @@
     "iPhone",
     "iPad"
   ],
-  "id": "__UNI__1031781",
+  "id": "__UNI__291402A",
   "name": "拨号",
   "version": {
     "name": "1.3.7",
@@ -82,7 +82,9 @@
         }
       },
       "google": {
+        "packagename": "com.phoneweb.dialer",
         "permissions": [
+          "<uses-permission android:name=\"android.permission.INTERNET\"/>",
           "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
           "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
           "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
@@ -128,7 +130,7 @@
     "uni-app": {
       "control": "uni-v3",
       "vueVersion": "3",
-      "compilerVersion": "4.57",
+      "compilerVersion": "5.06",
       "nvueCompiler": "uni-app",
       "renderer": "auto",
       "nvue": {
