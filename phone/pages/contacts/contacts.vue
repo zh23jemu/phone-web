@@ -7,17 +7,52 @@
       </view>
     </view>
     <!-- 中间内容 -->
-    <view class="contacts-empty">
+    <view v-if="contacts.length === 0" class="contacts-empty">
       <image src="/static/icons/lxr.png" class="contacts-empty-icon" />
       <view class="contacts-empty-text">您还没有任何联系人</view>
     </view>
-    <view v-for="contact in contacts" :key="contact.id">
-      <text>{{ contact.name }} - {{ contact.phone }}</text>
+    <view v-else class="contacts-list">
+      <view v-for="contact in contacts" :key="contact.id" class="contact-item">
+        <text class="contact-name">{{ contact.name }}</text>
+        <text class="contact-phone">{{ contact.phone }}</text>
+      </view>
     </view>
   </view>
 </template>
 
 <script>
+import { phoneApi } from '@/utils/api';
+
+const CP1252_BYTE_MAP = {
+    0x20AC: 0x80,
+    0x201A: 0x82,
+    0x0192: 0x83,
+    0x201E: 0x84,
+    0x2026: 0x85,
+    0x2020: 0x86,
+    0x2021: 0x87,
+    0x02C6: 0x88,
+    0x2030: 0x89,
+    0x0160: 0x8A,
+    0x2039: 0x8B,
+    0x0152: 0x8C,
+    0x017D: 0x8E,
+    0x2018: 0x91,
+    0x2019: 0x92,
+    0x201C: 0x93,
+    0x201D: 0x94,
+    0x2022: 0x95,
+    0x2013: 0x96,
+    0x2014: 0x97,
+    0x02DC: 0x98,
+    0x2122: 0x99,
+    0x0161: 0x9A,
+    0x203A: 0x9B,
+    0x0153: 0x9C,
+    0x017E: 0x9E,
+    0x0178: 0x9F
+};
+
 export default {
     data() {
         return {
@@ -28,15 +63,42 @@ export default {
         this.fetchContacts();
     },
     methods: {
+        fixGarbledText(text) {
+            if (typeof text !== 'string' || !text) {
+                return text;
+            }
+
+            try {
+                const bytes = new Uint8Array(
+                    Array.from(text).map(char => {
+                        const code = char.charCodeAt(0);
+                        if (code <= 0xff) {
+                            return code;
+                        }
+                        if (CP1252_BYTE_MAP[code] !== undefined) {
+                            return CP1252_BYTE_MAP[code];
+                        }
+                        throw new Error(`unsupported-char:${code}`);
+                    })
+                );
+                const decoded = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+                return decoded || text;
+            } catch (error) {
+                return text;
+            }
+        },
         async fetchContacts() {
             try {
                 const response = await uni.request({
-                    url: `http://127.0.0.1:9097/api/contacts`,
+                    url: phoneApi('/api/contacts'),
                     method: 'GET'
                 });
 
                 if (response.data.code === 0) {
-                    this.contacts = response.data.data;
+                    this.contacts = (response.data.data || []).map(contact => ({
+                        ...contact,
+                        name: this.fixGarbledText(contact.name)
+                    }));
                 } else {
                     // uni.showToast({
                     //     title: '获取联系人失败',
@@ -141,5 +203,23 @@ export default {
   color: #888;
   font-size: 36rpx;
   text-align: center;
+}
+.contacts-list {
+  padding: 24rpx 36rpx 40rpx;
+}
+.contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 8rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.contact-name {
+  color: #222;
+  font-size: 34rpx;
+}
+.contact-phone {
+  color: #666;
+  font-size: 30rpx;
 }
 </style> 

@@ -257,6 +257,7 @@
 <script>
 // 移除或注释掉 WebSocket 导入，因为拨号不再直接使用WS
 // import { connectWebSocket, closeWebSocket, sendWebSocketMessage, registerMessageHandler, wsStatus, messageStatus } from '@/utils/websocket'
+import { getPhoneLocationApiUrl, getPhoneLocationHeaders, phoneApi } from '@/utils/api';
 
 export default {
     data() {
@@ -384,16 +385,14 @@ export default {
 	            }
 	            
 	            uni.request({
-	                url: 'https://jisusjhmcx.market.alicloudapi.com/shouji/query?shouji=' + cleaned,
+	                url: getPhoneLocationApiUrl(cleaned),
 	                method: 'GET',
-	                header: {
-	                    'Authorization': 'APPCODE 2d27d29e43df4960a21ae35440eea039'
-	                },
+	                header: getPhoneLocationHeaders(),
 	                data: {},
 	                success: (res) => {
 	                    console.log('New location API response:', res.data);
-	                    if (res.statusCode === 200 && res.data && res.data.status === 0) {
-	                        const { province, city, company } = res.data.result;
+	                    if (res.statusCode === 200 && res.data && res.data.message === '查询成功') {
+	                        const { province, city, company } = res.data;
 	                        const processedChannel = company ? company.replace('中国', '') : '';
 	                        
 	                        console.log('原始归属地信息:', { province, city, company });
@@ -587,7 +586,7 @@ export default {
 			// 在跳转到通话页面之前，先将铃声状态设置为 false
 			try {
 				const res = await uni.request({
-					url: 'http://127.0.0.1:9097/api/ringtone-status',
+					url: phoneApi('/api/ringtone-status'),
 					method: 'POST',
 					data: {
 						userId: this.userId,
@@ -722,7 +721,7 @@ export default {
 
 	            const userId = this.userId;
 	            const response = await uni.request({
-	                url: 'http://127.0.0.1:9097/api/call-records',
+	                url: phoneApi('/api/call-records'),
 	                method: 'GET',
 	                data: {
 	                    userId: userId,
@@ -858,7 +857,7 @@ export default {
 	        try {
 	            console.log('Deleting record with ID:', callId);
 	            const res = await uni.request({
-	                url: 'http://127.0.0.1:9097/api/delete-call-record',
+	                url: phoneApi('/api/delete-call-record'),
 	                method: 'POST',
 	                data: {
 	                    callId: callId
@@ -913,7 +912,7 @@ export default {
             }
             try {
                 const res = await uni.request({
-                    url: `http://127.0.0.1:9097/api/check-incoming-calls?userId=${this.userId}`,
+                    url: phoneApi(`/api/check-incoming-calls?userId=${this.userId}`),
                     method: 'GET'
                 });
 

@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { authApi } from '@/utils/api';
+
 export default {
   data() {
     return {
@@ -49,7 +51,7 @@ export default {
 
       try {
         const response = await uni.request({
-          url: 'http://127.0.0.1:2025/api/login/account',
+          url: authApi('/api/login/account'),
           method: 'POST',
           data: {
             account: this.account,
@@ -81,7 +83,7 @@ export default {
     },
     getUserInfo(token) {
       uni.request({
-        url: 'http://127.0.0.1:2025/api/user/center',
+        url: authApi('/api/user/center'),
         method: 'GET',
         header: {
           'token': token // 在 header 中携带 token

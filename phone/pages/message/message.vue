@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import { phoneApi } from '@/utils/api';
 export default {
   name: "MessagePage",
   data() {
@@ -71,7 +72,7 @@ export default {
       this.isLoading = true
       try {
         const response = await uni.request({
-          url: 'http://127.0.0.1:9097/api/conversations',
+          url: phoneApi('/api/conversations'),
           method: 'GET',
           data: {
             userId: this.userId
@@ -136,7 +137,7 @@ export default {
 
         try {
           const response = await uni.request({
-            url: 'http://127.0.0.1:9097/api/delete-conversations',
+            url: phoneApi('/api/delete-conversations'),
             method: 'POST',
             data: {
               userId: this.userId,
@@ -226,7 +227,7 @@ export default {
         try {
             console.log('Deleting conversation with phone:', phone);
             const response = await uni.request({
-                url: 'http://127.0.0.1:9097/api/delete-conversation',
+                url: phoneApi('/api/delete-conversation'),
                 method: 'POST',
                 data: {
                     userId: this.userId,

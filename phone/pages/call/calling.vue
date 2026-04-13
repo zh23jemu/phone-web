@@ -67,8 +67,12 @@
   </template>
   
 <script>
+	// `u7746-wallpaper` 仅支持 App-Android，H5 下回退默认背景。
+	// #ifdef APP-PLUS
 	import u7746wallpaper from '@/uni_modules/u7746-wallpaper';
+	// #endif
 	import Logger from '@/utils/logger.js'
+	import { phoneApi } from '@/utils/api';
 	export default {
 		data() {
 			return {
@@ -398,6 +402,8 @@
 		        console.log('Using cached background image');
 		    } else {
 		        // 缓存不存在或已过期，重新获取
+		        this.imgUrl = '/static/images/bg.jpg';
+		        // #ifdef APP-PLUS
 		        const ret = u7746wallpaper.getBackground('test.png');
 		        if (ret.code === "1") {
 		            this.imgUrl = ret.msg;
@@ -406,9 +412,9 @@
 		            uni.setStorageSync('background_cache_time', now);
 		            console.log('Updated background image cache');
 		        } else {
-		            this.imgUrl = '/static/images/bg.jpg';
 		            console.log('Using default background image');
 		        }
+		        // #endif
 		    }
 
 		    // 只有在没有 callId 的情况下才发送拨号请求
@@ -502,7 +508,7 @@
 		  
 			  try {
 				  const res = await uni.request({
- 					  url: 'http://127.0.0.1:9097/api/dial',
+					  url: phoneApi('/api/dial'),
 					  method: 'POST',
 					  data: {
 						  number: this.number.replace(/\s/g, ''),
@@ -572,7 +578,7 @@
 		      if (!this.callId) return;
 		      try {
 		          const res = await uni.request({
-		              url: `http://127.0.0.1:9097/api/call-status`,
+		              url: phoneApi('/api/call-status'),
 		              method: 'GET',
 		              data: {
 		                  callId: this.callId
@@ -607,7 +613,7 @@
 		                          // 更新铃声状态为 false
 		                          try {
 		                              const ringtoneRes = await uni.request({
-		                                  url: 'http://127.0.0.1:9097/api/ringtone-status',
+		                                  url: phoneApi('/api/ringtone-status'),
 		                                  method: 'POST',
 		                                  data: {
 		                                      userId: this.userId,
@@ -708,7 +714,7 @@
 		      try {
 		          console.log('Sending background hangup request for callId:', this.callId);
 		          const res = await uni.request({
-		              url: 'http://127.0.0.1:9097/api/hangup',
+		              url: phoneApi('/api/hangup'),
 		              method: 'POST',
 		              data: {
 		                  callId: this.callId,
@@ -770,7 +776,7 @@
 		        // 更新服务器状态
 		        try {
 		            const res = await uni.request({
-		                url: 'http://127.0.0.1:9097/api/ringtone-status',
+		                url: phoneApi('/api/ringtone-status'),
 		                method: 'POST',
 		                data: {
 		                    userId: this.userId,
@@ -861,7 +867,7 @@
 		    // 添加通知服务器的逻辑
 		    try {
 		        const res = await uni.request({
-		            url: 'http://127.0.0.1:9097/api/ringtone-status',
+		            url: phoneApi('/api/ringtone-status'),
 		            method: 'POST',
 		            data: {
 		                userId: this.userId,
@@ -956,7 +962,7 @@
 		    }
 		    try {
 		        // Use POST method for the contact API as per server.py
-		        const apiUrl = `http://127.0.0.1:9097/api/contact`;
+		        const apiUrl = phoneApi('/api/contact');
 		        console.log('checkContactAndDisplay: Calling API:', apiUrl, 'with phone:', cleanedNumber);
 		        const res = await uni.request({
 		            url: apiUrl,
@@ -1014,7 +1020,7 @@
 
 		    try {
 		        const res = await uni.request({
-		            url: 'http://127.0.0.1:9097/api/ringtone-status',
+		            url: phoneApi('/api/ringtone-status'),
 		            method: 'GET',
 		            data: {
 		                userId: this.userId
@@ -1107,7 +1113,7 @@
 				try {
 					const userId = uni.getStorageSync('userId') || 6;
 					const response = await uni.request({
-						url: 'http://127.0.0.1:9097/api/call-records',
+						url: phoneApi('/api/call-records'),
 						method: 'GET',
 						data: {
 							userId: userId,
@@ -1439,4 +1445,3 @@
     }
 }
 </style>
-

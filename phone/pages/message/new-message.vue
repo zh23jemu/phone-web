@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { phoneApi } from '@/utils/api';
 export default {
   name: "NewMessagePage",
   data() {
@@ -51,7 +52,7 @@ export default {
 
       try {
         const response = await uni.request({
-          url: 'http://127.0.0.1:9097/api/send-message',
+          url: phoneApi('/api/send-message'),
           method: 'POST',
           data: {
             senderId: this.userId,
