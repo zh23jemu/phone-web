@@ -391,9 +391,14 @@ export default {
 	                data: {},
 	                success: (res) => {
 	                    console.log('New location API response:', res.data);
-	                    if (res.statusCode === 200 && res.data && res.data.message === '查询成功') {
-	                        const { province, city, company } = res.data;
-	                        const processedChannel = company ? company.replace('中国', '') : '';
+	                    const locationData = res.data?.data || res.data?.result || res.data;
+	                    const province = locationData?.province || locationData?.prov || locationData?.region || '';
+	                    const city = locationData?.city || locationData?.area || '';
+	                    const company = locationData?.company || locationData?.isp || locationData?.sp || locationData?.carrier || '';
+	                    const processedChannel = company ? String(company).replace('中国', '') : '';
+	                    const hasLocation = province || city || processedChannel;
+
+	                    if (res.statusCode === 200 && locationData && hasLocation) {
 	                        
 	                        console.log('原始归属地信息:', { province, city, company });
 	                        

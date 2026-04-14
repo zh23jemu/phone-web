@@ -1,5 +1,8 @@
 const DEFAULT_H5_HOST = '127.0.0.1';
 const DEFAULT_APP_HOST = '10.70.11.103';
+const PHONE_LOCATION_HOST = 'https://ec8a.api.huachen.cn';
+const PHONE_LOCATION_PATH = '/mobile';
+const DEFAULT_PHONE_LOCATION_APPCODE = '46272f643425432a86b3977ba66c7798';
 
 export function getApiHost() {
 	let host = DEFAULT_H5_HOST;
@@ -38,11 +41,22 @@ export function phoneApi(path) {
 }
 
 export function getPhoneLocationApiUrl(phone) {
-	return `https://sjlocation.market.alicloudapi.com/phoneLocation?phone=${phone}`;
+	return `${PHONE_LOCATION_HOST}${PHONE_LOCATION_PATH}?mobile=${phone}`;
 }
 
 export function getPhoneLocationHeaders() {
+	let appcode = DEFAULT_PHONE_LOCATION_APPCODE;
+
+	try {
+		const customAppcode = uni.getStorageSync('phoneLocationAppCode');
+		if (customAppcode) {
+			appcode = customAppcode;
+		}
+	} catch (error) {
+		console.warn('读取号码归属地 AppCode 失败:', error);
+	}
+
 	return {
-		Authorization: 'APPCODE 491888295cf04028891dcf4d907365f3'
+		Authorization: `APPCODE ${appcode}`
 	};
 }
