@@ -63,25 +63,77 @@ export default {
         this.fetchContacts();
     },
     methods: {
+        decodeUtf8Bytes(bytes) {
+            let result = '';
+
+            for (let i = 0; i < bytes.length; i += 1) {
+                const byte1 = bytes[i];
+
+                if (byte1 < 0x80) {
+                    result += String.fromCharCode(byte1);
+                    continue;
+                }
+
+                if ((byte1 & 0xe0) === 0xc0 && i + 1 < bytes.length) {
+                    const byte2 = bytes[i + 1];
+                    result += String.fromCharCode(((byte1 & 0x1f) << 6) | (byte2 & 0x3f));
+                    i += 1;
+                    continue;
+                }
+
+                if ((byte1 & 0xf0) === 0xe0 && i + 2 < bytes.length) {
+                    const byte2 = bytes[i + 1];
+                    const byte3 = bytes[i + 2];
+                    result += String.fromCharCode(
+                        ((byte1 & 0x0f) << 12) |
+                        ((byte2 & 0x3f) << 6) |
+                        (byte3 & 0x3f)
+                    );
+                    i += 2;
+                    continue;
+                }
+
+                if ((byte1 & 0xf8) === 0xf0 && i + 3 < bytes.length) {
+                    const byte2 = bytes[i + 1];
+                    const byte3 = bytes[i + 2];
+                    const byte4 = bytes[i + 3];
+                    const codePoint =
+                        ((byte1 & 0x07) << 18) |
+                        ((byte2 & 0x3f) << 12) |
+                        ((byte3 & 0x3f) << 6) |
+                        (byte4 & 0x3f);
+
+                    const offset = codePoint - 0x10000;
+                    result += String.fromCharCode(
+                        0xd800 + (offset >> 10),
+                        0xdc00 + (offset & 0x3ff)
+                    );
+                    i += 3;
+                    continue;
+                }
+
+                throw new Error(`invalid-utf8-byte:${byte1}`);
+            }
+
+            return result;
+        },
         fixGarbledText(text) {
             if (typeof text !== 'string' || !text) {
                 return text;
             }
 
             try {
-                const bytes = new Uint8Array(
-                    Array.from(text).map(char => {
-                        const code = char.charCodeAt(0);
-                        if (code <= 0xff) {
-                            return code;
-                        }
-                        if (CP1252_BYTE_MAP[code] !== undefined) {
-                            return CP1252_BYTE_MAP[code];
-                        }
-                        throw new Error(`unsupported-char:${code}`);
-                    })
-                );
-                const decoded = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+                const bytes = Array.from(text).map(char => {
+                    const code = char.charCodeAt(0);
+                    if (code <= 0xff) {
+                        return code;
+                    }
+                    if (CP1252_BYTE_MAP[code] !== undefined) {
+                        return CP1252_BYTE_MAP[code];
+                    }
+                    throw new Error(`unsupported-char:${code}`);
+                });
+                const decoded = this.decodeUtf8Bytes(bytes);
                 return decoded || text;
             } catch (error) {
                 return text;
