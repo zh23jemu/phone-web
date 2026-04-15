@@ -22,6 +22,7 @@
 
 <script>
 import { phoneApi } from '@/utils/api';
+import { fixGarbledText } from '@/utils/text';
 
 const CP1252_BYTE_MAP = {
     0x20AC: 0x80,
@@ -139,18 +140,21 @@ export default {
                 return text;
             }
         },
-        async fetchContacts() {
-            try {
-                const response = await uni.request({
-                    url: phoneApi('/api/contacts'),
-                    method: 'GET'
-                });
+            async fetchContacts() {
+                try {
+                    const response = await uni.request({
+                        url: phoneApi('/api/contacts'),
+                        method: 'GET'
+                    });
 
-                if (response.data.code === 0) {
-                    this.contacts = (response.data.data || []).map(contact => ({
-                        ...contact,
-                        name: this.fixGarbledText(contact.name)
-                    }));
+                    if (response.data.code === 0) {
+                    const hiddenContactNames = ['中国移动', '中国联通', '中国电信'];
+                    this.contacts = (response.data.data || [])
+                        .map(contact => ({
+                            ...contact,
+                            name: fixGarbledText(contact.name)
+                        }))
+                        .filter(contact => !hiddenContactNames.includes((contact.name || '').trim()));
                 } else {
                     // uni.showToast({
                     //     title: '获取联系人失败',

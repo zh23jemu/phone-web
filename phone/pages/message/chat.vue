@@ -82,6 +82,7 @@
 
 <script>
 import { phoneApi } from '@/utils/api';
+import { fixGarbledText } from '@/utils/text';
 export default {
   name: "ChatPage",
   data() {
@@ -105,12 +106,67 @@ export default {
   onLoad(options) {
     if (options.phone) {
       this.phone = options.phone;
-      this.displayName = decodeURIComponent(options.displayName || options.phone);
+      this.displayName = fixGarbledText(decodeURIComponent(options.displayName || options.phone));
       this.checkContactAndDisplay(this.phone);
       this.fetchMessages();
     }
   },
   methods: {
+    decodeUtf8Bytes(bytes) {
+      let result = ''
+      for (let i = 0; i < bytes.length; i += 1) {
+        const byte1 = bytes[i]
+        if (byte1 < 0x80) {
+          result += String.fromCharCode(byte1)
+          continue
+        }
+        if ((byte1 & 0xe0) === 0xc0 && i + 1 < bytes.length) {
+          const byte2 = bytes[i + 1]
+          result += String.fromCharCode(((byte1 & 0x1f) << 6) | (byte2 & 0x3f))
+          i += 1
+          continue
+        }
+        if ((byte1 & 0xf0) === 0xe0 && i + 2 < bytes.length) {
+          const byte2 = bytes[i + 1]
+          const byte3 = bytes[i + 2]
+          result += String.fromCharCode(((byte1 & 0x0f) << 12) | ((byte2 & 0x3f) << 6) | (byte3 & 0x3f))
+          i += 2
+          continue
+        }
+        if ((byte1 & 0xf8) === 0xf0 && i + 3 < bytes.length) {
+          const byte2 = bytes[i + 1]
+          const byte3 = bytes[i + 2]
+          const byte4 = bytes[i + 3]
+          const codePoint = ((byte1 & 0x07) << 18) | ((byte2 & 0x3f) << 12) | ((byte3 & 0x3f) << 6) | (byte4 & 0x3f)
+          result += String.fromCodePoint(codePoint)
+          i += 3
+          continue
+        }
+        throw new Error(`invalid-utf8-byte:${byte1}`)
+      }
+      return result
+    },
+    fixGarbledText(text) {
+      if (typeof text !== 'string' || !text) {
+        return text
+      }
+      try {
+        const bytes = Array.from(text).map(char => {
+          const code = char.charCodeAt(0)
+          if (code <= 0xff) {
+            return code
+          }
+          if (CP1252_BYTE_MAP[code] !== undefined) {
+            return CP1252_BYTE_MAP[code]
+          }
+          throw new Error(`unsupported-char:${code}`)
+        })
+        const decoded = this.decodeUtf8Bytes(bytes)
+        return decoded || text
+      } catch (error) {
+        return text
+      }
+    },
     async fetchMessages(isLoadMore = false) {
       if (this.isLoading || (!isLoadMore && !this.hasMore)) return;
 
@@ -354,7 +410,7 @@ export default {
           if (res.statusCode === 200 && res.data && res.data.code === 0 && res.data.data) {
               // Contact found, update displayName to contact name
               console.log('checkContactAndDisplay: Contact found. Updating displayName.');
-              this.displayName = res.data.data.name;  // Display name
+              this.displayName = fixGarbledText(res.data.data.name);  // Display name
               console.log('checkContactAndDisplay: Updated displayName to:', this.displayName);
           } else {
               // Contact not found or API returned error/no data - keep initial displayName
