@@ -38,6 +38,39 @@ if (uni.restoreGlobal) {
       console[type].apply(console, [...args, filename]);
     }
   }
+  const DEFAULT_H5_HOST = "127.0.0.1";
+  const DEFAULT_APP_HOST = "10.70.11.103";
+  function getApiHost() {
+    let host = DEFAULT_H5_HOST;
+    host = DEFAULT_APP_HOST;
+    try {
+      const customHost = uni.getStorageSync("serverHost");
+      if (customHost) {
+        host = customHost;
+      }
+    } catch (error2) {
+      formatAppLog("warn", "at utils/api.js:21", "读取自定义接口地址失败:", error2);
+    }
+    return host;
+  }
+  function getAuthBaseUrl() {
+    return `http://${getApiHost()}:2025`;
+  }
+  function getPhoneServiceBaseUrl() {
+    return `http://${getApiHost()}:9097`;
+  }
+  function authApi(path) {
+    return `${getAuthBaseUrl()}${path}`;
+  }
+  function phoneApi(path) {
+    return `${getPhoneServiceBaseUrl()}${path}`;
+  }
+  function getPhoneLocationApiUrl(phone) {
+    return phoneApi(`/api/phone-location?phone=${phone}`);
+  }
+  function getPhoneLocationHeaders() {
+    return {};
+  }
   const _imports_0$7 = "/static/icons/default.png";
   const _imports_1$5 = "/static/icons/hd.png";
   const _imports_2$4 = "/static/icons/warning.png";
@@ -148,10 +181,10 @@ if (uni.restoreGlobal) {
       }
     },
     onLoad() {
-      formatAppLog("log", "at pages/dial/dial.vue:341", "Dial page onLoad");
+      formatAppLog("log", "at pages/dial/dial.vue:342", "Dial page onLoad");
       this.audioContext = uni.createInnerAudioContext();
       this.audioContext.onError((res) => {
-        formatAppLog("error", "at pages/dial/dial.vue:345", "Audio Error:", res.errMsg);
+        formatAppLog("error", "at pages/dial/dial.vue:346", "Audio Error:", res.errMsg);
       });
       this.clearLocationCache();
       this.testLocationLogic();
@@ -178,38 +211,41 @@ if (uni.restoreGlobal) {
             return;
           }
           uni.request({
-            url: "https://jisusjhmcx.market.alicloudapi.com/shouji/query?shouji=" + cleaned,
+            url: getPhoneLocationApiUrl(cleaned),
             method: "GET",
-            header: {
-              "Authorization": "APPCODE 2d27d29e43df4960a21ae35440eea039"
-            },
+            header: getPhoneLocationHeaders(),
             data: {},
             success: (res) => {
-              formatAppLog("log", "at pages/dial/dial.vue:394", "New location API response:", res.data);
-              if (res.statusCode === 200 && res.data && res.data.status === 0) {
-                const { province, city, company } = res.data.result;
-                const processedChannel = company ? company.replace("中国", "") : "";
-                formatAppLog("log", "at pages/dial/dial.vue:399", "原始归属地信息:", { province, city, company });
+              var _a, _b;
+              formatAppLog("log", "at pages/dial/dial.vue:393", "New location API response:", res.data);
+              const locationData = ((_a = res.data) == null ? void 0 : _a.data) || ((_b = res.data) == null ? void 0 : _b.result) || res.data;
+              const province = (locationData == null ? void 0 : locationData.province) || (locationData == null ? void 0 : locationData.prov) || (locationData == null ? void 0 : locationData.region) || "";
+              const city = (locationData == null ? void 0 : locationData.city) || (locationData == null ? void 0 : locationData.area) || "";
+              const company = (locationData == null ? void 0 : locationData.company) || (locationData == null ? void 0 : locationData.isp) || (locationData == null ? void 0 : locationData.sp) || (locationData == null ? void 0 : locationData.carrier) || "";
+              const processedChannel = company ? String(company).replace("中国", "") : "";
+              const hasLocation = province || city || processedChannel;
+              if (res.statusCode === 200 && locationData && hasLocation) {
+                formatAppLog("log", "at pages/dial/dial.vue:403", "原始归属地信息:", { province, city, company });
                 let location = "";
                 const municipalities = ["北京", "天津", "上海", "重庆"];
                 if (municipalities.includes(province)) {
                   location = province;
-                  formatAppLog("log", "at pages/dial/dial.vue:411", "检测到直辖市:", province);
+                  formatAppLog("log", "at pages/dial/dial.vue:415", "检测到直辖市:", province);
                 } else if (province && city) {
                   location = `${province}${city}`;
-                  formatAppLog("log", "at pages/dial/dial.vue:415", "普通省市拼接:", location);
+                  formatAppLog("log", "at pages/dial/dial.vue:419", "普通省市拼接:", location);
                 } else if (province) {
                   location = province;
-                  formatAppLog("log", "at pages/dial/dial.vue:419", "只有省份:", location);
+                  formatAppLog("log", "at pages/dial/dial.vue:423", "只有省份:", location);
                 } else if (city) {
                   location = city;
-                  formatAppLog("log", "at pages/dial/dial.vue:423", "只有城市:", location);
+                  formatAppLog("log", "at pages/dial/dial.vue:427", "只有城市:", location);
                 }
                 if (processedChannel) {
                   location += ` ${processedChannel}`;
                 }
                 location = location.trim();
-                formatAppLog("log", "at pages/dial/dial.vue:432", "最终归属地显示:", location);
+                formatAppLog("log", "at pages/dial/dial.vue:436", "最终归属地显示:", location);
                 this.numberLocation = location;
                 uni.setStorageSync(`location_${cleaned}`, location);
               } else {
@@ -255,7 +291,7 @@ if (uni.restoreGlobal) {
           if (lastDialedNumber) {
             this.inputNumber = this.formatPhoneNumber(lastDialedNumber);
             this.updateNumberLocation(lastDialedNumber);
-            formatAppLog("log", "at pages/dial/dial.vue:512", "Input empty, filled with last dialed number:", lastDialedNumber);
+            formatAppLog("log", "at pages/dial/dial.vue:516", "Input empty, filled with last dialed number:", lastDialedNumber);
             return;
           } else {
             uni.showToast({ title: "请输入号码", icon: "none" });
@@ -311,13 +347,13 @@ if (uni.restoreGlobal) {
           return;
         }
         if (cleanedNumber.includes("*") || cleanedNumber.includes("#")) {
-          formatAppLog("log", "at pages/dial/dial.vue:582", "Non-MMI code with * or # detected, removing special characters.");
+          formatAppLog("log", "at pages/dial/dial.vue:586", "Non-MMI code with * or # detected, removing special characters.");
           cleanedNumber = cleanedNumber.replace(/[\*#]/g, "");
-          formatAppLog("log", "at pages/dial/dial.vue:584", "Cleaned number:", cleanedNumber);
+          formatAppLog("log", "at pages/dial/dial.vue:588", "Cleaned number:", cleanedNumber);
         }
         try {
           const res = await uni.request({
-            url: "http://106.53.30.150:9097/api/ringtone-status",
+            url: phoneApi("/api/ringtone-status"),
             method: "POST",
             data: {
               userId: this.userId,
@@ -325,12 +361,12 @@ if (uni.restoreGlobal) {
             }
           });
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
-            formatAppLog("log", "at pages/dial/dial.vue:599", "Successfully set ringtone status to false before dialing");
+            formatAppLog("log", "at pages/dial/dial.vue:603", "Successfully set ringtone status to false before dialing");
           } else {
-            formatAppLog("error", "at pages/dial/dial.vue:601", "Failed to set ringtone status to false before dialing");
+            formatAppLog("error", "at pages/dial/dial.vue:605", "Failed to set ringtone status to false before dialing");
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/dial/dial.vue:604", "Error setting ringtone status to false before dialing:", error2);
+          formatAppLog("error", "at pages/dial/dial.vue:608", "Error setting ringtone status to false before dialing:", error2);
         }
         uni.setStorageSync("lastDialedNumber", cleanedNumber);
         const currentLocation = this.numberLocation;
@@ -380,13 +416,13 @@ if (uni.restoreGlobal) {
         }
       },
       onCallListScrollToLower(e) {
-        formatAppLog("log", "at pages/dial/dial.vue:671", "scrolltolower event triggered.", {
+        formatAppLog("log", "at pages/dial/dial.vue:675", "scrolltolower event triggered.", {
           isLoading: this.isLoading,
           hasMore: this.hasMore,
           currentPage: this.currentPage
         });
         if (!this.isLoading && this.hasMore) {
-          formatAppLog("log", "at pages/dial/dial.vue:679", "Triggering load more from scrolltolower...");
+          formatAppLog("log", "at pages/dial/dial.vue:683", "Triggering load more from scrolltolower...");
           this.fetchCallRecords(true);
         }
       },
@@ -422,7 +458,7 @@ if (uni.restoreGlobal) {
         try {
           const preloadedRecords = uni.getStorageSync("preloaded_call_records");
           if (preloadedRecords && !isLoadMore) {
-            formatAppLog("log", "at pages/dial/dial.vue:713", "Using preloaded call records");
+            formatAppLog("log", "at pages/dial/dial.vue:717", "Using preloaded call records");
             this.callLogs = preloadedRecords;
             this.currentPage = 1;
             this.hasMore = preloadedRecords.length === this.pageSize;
@@ -432,7 +468,7 @@ if (uni.restoreGlobal) {
           }
           const userId = this.userId;
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/call-records",
+            url: phoneApi("/api/call-records"),
             method: "GET",
             data: {
               userId,
@@ -464,7 +500,7 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/dial/dial.vue:760", "获取呼叫记录失败:", error2);
+          formatAppLog("error", "at pages/dial/dial.vue:764", "获取呼叫记录失败:", error2);
           uni.showToast({
             title: "获取呼叫记录失败",
             icon: "none"
@@ -547,9 +583,9 @@ if (uni.restoreGlobal) {
       },
       async deleteRecord(callId) {
         try {
-          formatAppLog("log", "at pages/dial/dial.vue:859", "Deleting record with ID:", callId);
+          formatAppLog("log", "at pages/dial/dial.vue:863", "Deleting record with ID:", callId);
           const res = await uni.request({
-            url: "http://106.53.30.150:9097/api/delete-call-record",
+            url: phoneApi("/api/delete-call-record"),
             method: "POST",
             data: {
               callId
@@ -558,7 +594,7 @@ if (uni.restoreGlobal) {
               "Content-Type": "application/json"
             }
           });
-          formatAppLog("log", "at pages/dial/dial.vue:870", "Delete response:", res);
+          formatAppLog("log", "at pages/dial/dial.vue:874", "Delete response:", res);
           if (res.data.code === 0) {
             uni.showToast({
               title: "删除成功",
@@ -572,7 +608,7 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/dial/dial.vue:886", "删除通话记录失败:", error2);
+          formatAppLog("error", "at pages/dial/dial.vue:890", "删除通话记录失败:", error2);
           uni.showToast({
             title: "删除失败",
             icon: "none"
@@ -581,29 +617,29 @@ if (uni.restoreGlobal) {
       },
       // ===> 添加来电轮询方法 <===
       startIncomingCallPolling() {
-        formatAppLog("log", "at pages/dial/dial.vue:895", "Starting incoming call polling...");
+        formatAppLog("log", "at pages/dial/dial.vue:899", "Starting incoming call polling...");
         this.incomingCallPollTimer = setInterval(() => {
           this.checkIncomingCall();
         }, 3e3);
       },
       stopIncomingCallPolling() {
         if (this.incomingCallPollTimer) {
-          formatAppLog("log", "at pages/dial/dial.vue:903", "Stopping incoming call polling...");
+          formatAppLog("log", "at pages/dial/dial.vue:907", "Stopping incoming call polling...");
           clearInterval(this.incomingCallPollTimer);
           this.incomingCallPollTimer = null;
         }
       },
       async checkIncomingCall() {
         if (!this.userId) {
-          formatAppLog("warn", "at pages/dial/dial.vue:911", "Cannot check incoming calls: userId is not set.");
+          formatAppLog("warn", "at pages/dial/dial.vue:915", "Cannot check incoming calls: userId is not set.");
           return;
         }
         try {
           const res = await uni.request({
-            url: `http://106.53.30.150:9097/api/check-incoming-calls?userId=${this.userId}`,
+            url: phoneApi(`/api/check-incoming-calls?userId=${this.userId}`),
             method: "GET"
           });
-          formatAppLog("log", "at pages/dial/dial.vue:920", "Check incoming calls response:", res.data);
+          formatAppLog("log", "at pages/dial/dial.vue:924", "Check incoming calls response:", res.data);
           if (res.statusCode === 200 && res.data && res.data.code === 0 && res.data.data) {
             const incomingCall = res.data.data;
             if (incomingCall.status === "ringing" && incomingCall.call_type === "redial") {
@@ -611,7 +647,7 @@ if (uni.restoreGlobal) {
               const currentPage = pages[pages.length - 1];
               const currentRoute = currentPage ? currentPage.route : "";
               if (!currentRoute.includes("call") && !currentRoute.includes("call-back")) {
-                formatAppLog("log", "at pages/dial/dial.vue:933", "Incoming call detected:", incomingCall);
+                formatAppLog("log", "at pages/dial/dial.vue:937", "Incoming call detected:", incomingCall);
                 this.stopIncomingCallPolling();
                 uni.navigateTo({
                   url: `/pages/call-back/call-back?callId=${incomingCall.callId}&number=${encodeURIComponent(incomingCall.number)}&dialerUserId=${incomingCall.dialerUserId}&location=${encodeURIComponent(incomingCall.location || "未知位置")}&markType=${incomingCall.mark_type || ""}`
@@ -620,7 +656,7 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/dial/dial.vue:944", "Error checking incoming calls:", error2);
+          formatAppLog("error", "at pages/dial/dial.vue:948", "Error checking incoming calls:", error2);
         }
       },
       // <=== 结束添加来电轮询方法 ===>
@@ -631,18 +667,18 @@ if (uni.restoreGlobal) {
       },
       // Add a new method to navigate to call details page
       goToCallDetails(callId) {
-        formatAppLog("log", "at pages/dial/dial.vue:956", "Clicked info icon for callId:", callId);
+        formatAppLog("log", "at pages/dial/dial.vue:960", "Clicked info icon for callId:", callId);
         const callItem = this.callLogs.find((item) => item.id === callId);
         if (callItem) {
-          formatAppLog("log", "at pages/dial/dial.vue:960", "Found call item:", callItem);
-          formatAppLog("log", "at pages/dial/dial.vue:961", "Navigating with number:", callItem.number);
+          formatAppLog("log", "at pages/dial/dial.vue:964", "Found call item:", callItem);
+          formatAppLog("log", "at pages/dial/dial.vue:965", "Navigating with number:", callItem.number);
           uni.navigateTo({
             url: `/pages/call-details/call-details?number=${encodeURIComponent(callItem.number)}`
             // We can also pass other info if needed, like displayName or location
             // url: `/pages/call-details/call-details?number=${encodeURIComponent(callItem.number)}&displayName=${encodeURIComponent(callItem.displayName || '')}&location=${encodeURIComponent(callItem.location || '')}`
           });
         } else {
-          formatAppLog("error", "at pages/dial/dial.vue:969", "Could not find call item with ID:", callId);
+          formatAppLog("error", "at pages/dial/dial.vue:973", "Could not find call item with ID:", callId);
           uni.showToast({
             title: "无法获取号码信息",
             icon: "none"
@@ -652,7 +688,7 @@ if (uni.restoreGlobal) {
       setupEventListeners() {
         uni.$off("clearDialInput");
         uni.$on("clearDialInput", () => {
-          formatAppLog("log", "at pages/dial/dial.vue:981", "clearDialInput event received");
+          formatAppLog("log", "at pages/dial/dial.vue:985", "clearDialInput event received");
           this.inputNumber = "";
           this.numberLocation = "";
           this.clearSearchAndCache();
@@ -752,19 +788,19 @@ if (uni.restoreGlobal) {
       },
       searchCallLogs(query) {
         const startTime = Date.now();
-        formatAppLog("log", "at pages/dial/dial.vue:1104", "开始搜索，查询字符串:", query);
+        formatAppLog("log", "at pages/dial/dial.vue:1108", "开始搜索，查询字符串:", query);
         if (!query) {
-          formatAppLog("log", "at pages/dial/dial.vue:1106", "查询字符串为空，清空搜索结果");
+          formatAppLog("log", "at pages/dial/dial.vue:1110", "查询字符串为空，清空搜索结果");
           this.searchResults = [];
           return;
         }
         if (this.searchCache.has(query)) {
-          formatAppLog("log", "at pages/dial/dial.vue:1113", "使用缓存的搜索结果");
+          formatAppLog("log", "at pages/dial/dial.vue:1117", "使用缓存的搜索结果");
           this.searchResults = this.searchCache.get(query);
           this.logPerformance("searchCallLogs (cached)", startTime);
           return;
         }
-        formatAppLog("log", "at pages/dial/dial.vue:1119", "通话记录总数:", this.callLogs.length);
+        formatAppLog("log", "at pages/dial/dial.vue:1123", "通话记录总数:", this.callLogs.length);
         if (query.length < 2) {
           this.searchResults = [];
           this.logPerformance("searchCallLogs (short query)", startTime);
@@ -784,7 +820,7 @@ if (uni.restoreGlobal) {
           this.searchCache.delete(firstKey);
         }
         this.searchResults = results;
-        formatAppLog("log", "at pages/dial/dial.vue:1150", "搜索结果数量:", results.length);
+        formatAppLog("log", "at pages/dial/dial.vue:1154", "搜索结果数量:", results.length);
         this.logPerformance("searchCallLogs", startTime);
       },
       handleSearchResultTouchStart(item, index) {
@@ -810,7 +846,7 @@ if (uni.restoreGlobal) {
       logPerformance(operation, startTime) {
         const endTime = Date.now();
         const duration = endTime - startTime;
-        formatAppLog("log", "at pages/dial/dial.vue:1177", `性能监控 - ${operation}: ${duration}ms`);
+        formatAppLog("log", "at pages/dial/dial.vue:1181", `性能监控 - ${operation}: ${duration}ms`);
       },
       // 添加清理归属地缓存的方法
       clearLocationCache() {
@@ -820,7 +856,7 @@ if (uni.restoreGlobal) {
             uni.removeStorageSync(key);
           }
         });
-        formatAppLog("log", "at pages/dial/dial.vue:1188", "已清理归属地缓存");
+        formatAppLog("log", "at pages/dial/dial.vue:1192", "已清理归属地缓存");
       },
       // 添加测试归属地处理逻辑的方法
       testLocationLogic() {
@@ -832,7 +868,7 @@ if (uni.restoreGlobal) {
           { province: "四川", city: "成都", company: "", expected: "四川成都" },
           { province: "重庆", city: "重庆", company: "中国移动", expected: "重庆 移动" }
         ];
-        formatAppLog("log", "at pages/dial/dial.vue:1201", "测试归属地处理逻辑:");
+        formatAppLog("log", "at pages/dial/dial.vue:1205", "测试归属地处理逻辑:");
         testCases.forEach((testCase, index) => {
           const { province, city, company } = testCase;
           const processedChannel = company ? company.replace("中国", "") : "";
@@ -851,7 +887,7 @@ if (uni.restoreGlobal) {
             location += ` ${processedChannel}`;
           }
           location = location.trim();
-          formatAppLog("log", "at pages/dial/dial.vue:1225", `测试用例 ${index + 1}:`, {
+          formatAppLog("log", "at pages/dial/dial.vue:1229", `测试用例 ${index + 1}:`, {
             input: { province, city, company },
             output: location,
             expected: testCase.expected,
@@ -1528,7 +1564,7 @@ if (uni.restoreGlobal) {
         }
         try {
           const response = await uni.request({
-            url: "http://106.53.30.150:2025/api/login/account",
+            url: authApi("/api/login/account"),
             method: "POST",
             data: {
               account: this.account,
@@ -1537,7 +1573,7 @@ if (uni.restoreGlobal) {
               scene: 1
             }
           });
-          formatAppLog("log", "at pages/auth/login.vue:62", "Login response:", response);
+          formatAppLog("log", "at pages/auth/login.vue:64", "Login response:", response);
           if (response.statusCode === 200 && response.data && response.data.code === 1) {
             uni.showToast({ title: "登录成功", icon: "success" });
             const token = response.data.data.token;
@@ -1547,13 +1583,13 @@ if (uni.restoreGlobal) {
             uni.showToast({ title: ((_a = response.data) == null ? void 0 : _a.msg) || "登录失败", icon: "none" });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/auth/login.vue:78", "Login failed:", error2);
+          formatAppLog("error", "at pages/auth/login.vue:80", "Login failed:", error2);
           uni.showToast({ title: "网络错误", icon: "none" });
         }
       },
       getUserInfo(token) {
         uni.request({
-          url: "http://106.53.30.150:2025/api/user/center",
+          url: authApi("/api/user/center"),
           method: "GET",
           header: {
             "token": token
@@ -1561,11 +1597,11 @@ if (uni.restoreGlobal) {
           },
           success: (res) => {
             var _a;
-            formatAppLog("log", "at pages/auth/login.vue:90", "User info response:", res);
+            formatAppLog("log", "at pages/auth/login.vue:92", "User info response:", res);
             if (res.statusCode === 200 && res.data && res.data.code === 1) {
               const userId = res.data.data.id;
               uni.setStorageSync("userId", userId);
-              formatAppLog("log", "at pages/auth/login.vue:94", "Stored userId:", userId);
+              formatAppLog("log", "at pages/auth/login.vue:96", "Stored userId:", userId);
               uni.reLaunch({
                 url: "/pages/dial/dial"
               });
@@ -1577,7 +1613,7 @@ if (uni.restoreGlobal) {
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/auth/login.vue:110", "Failed to get user info:", err);
+            formatAppLog("error", "at pages/auth/login.vue:112", "Failed to get user info:", err);
             uni.showToast({ title: "获取用户信息网络错误", icon: "none" });
             uni.reLaunch({
               url: "/pages/dial/dial"
@@ -1639,17 +1675,6 @@ if (uni.restoreGlobal) {
     ]);
   }
   const PagesAuthLogin = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2cc9f8c3"], ["__file", "C:/Coding/phone-web/phone/pages/auth/login.vue"]]);
-  const { registerUTSInterface, initUTSProxyClass, initUTSProxyFunction, initUTSPackageName, initUTSIndexClassName, initUTSClassName } = uni;
-  const name = "u7746Wallpaper";
-  const moduleName = "u7746-wallpaper";
-  const moduleType = "";
-  const errMsg = ``;
-  const is_uni_modules = true;
-  const pkg = /* @__PURE__ */ initUTSPackageName(name, is_uni_modules);
-  const cls = /* @__PURE__ */ initUTSIndexClassName(name, is_uni_modules);
-  const exports$1 = { __esModule: true };
-  exports$1.getBackground = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "getBackgroundByJs", keepAlive: false, params: [{ "name": "wallpaperName", "type": "string" }], return: "" });
-  uni.registerUTSPlugin("uni_modules/u7746-wallpaper", exports$1);
   const u7746wallpaper = uni.requireUTSPlugin("uni_modules/u7746-wallpaper");
   const STORAGE_KEY = "app_logs";
   const MAX_LOGS = 1e3;
@@ -1745,6 +1770,7 @@ if (uni.restoreGlobal) {
     data() {
       return {
         imgUrl: "",
+        wallpaperDebugText: "背景来源：未初始化",
         number: "186 8828 2571",
         location: "未知",
         status: "正在拨号...",
@@ -1994,15 +2020,15 @@ if (uni.restoreGlobal) {
       }, 3e3);
       this.audioContext = uni.createInnerAudioContext();
       this.audioContext.onError((res) => {
-        formatAppLog("error", "at pages/call/calling.vue:318", "Audio Error:", res.errMsg);
+        formatAppLog("error", "at pages/call/calling.vue:324", "Audio Error:", res.errMsg);
       });
       this.ringtoneContext = uni.createInnerAudioContext();
       this.ringtoneContext.onEnded(() => {
-        formatAppLog("log", "at pages/call/calling.vue:324", "Ringtone finished playing, checking duration.");
+        formatAppLog("log", "at pages/call/calling.vue:330", "Ringtone finished playing, checking duration.");
         const currentTime = Math.floor(Date.now() / 1e3);
         const elapsedTime = currentTime - this.ringtoneStartTime;
         if (elapsedTime >= this.maxRingtoneDuration) {
-          formatAppLog("log", "at pages/call/calling.vue:330", "Maximum duration reached, stopping playback.");
+          formatAppLog("log", "at pages/call/calling.vue:336", "Maximum duration reached, stopping playback.");
           this.stopRingtoneAndNavigate();
         } else {
           if (this.ringtoneContext) {
@@ -2012,12 +2038,12 @@ if (uni.restoreGlobal) {
         }
       });
       this.ringtoneContext.onError((res) => {
-        formatAppLog("error", "at pages/call/calling.vue:341", "Ringtone Error:", res.errMsg);
+        formatAppLog("error", "at pages/call/calling.vue:347", "Ringtone Error:", res.errMsg);
       });
-      formatAppLog("log", "at pages/call/calling.vue:343", "Successfully created uni.createInnerAudioContext for ringtone.");
+      formatAppLog("log", "at pages/call/calling.vue:349", "Successfully created uni.createInnerAudioContext for ringtone.");
       this.endCallContext = uni.createInnerAudioContext();
       this.endCallContext.onError((res) => {
-        formatAppLog("error", "at pages/call/calling.vue:348", "End Call Music Error:", res.errMsg);
+        formatAppLog("error", "at pages/call/calling.vue:354", "End Call Music Error:", res.errMsg);
       });
       let originalNumber = "";
       let originalLocation = "";
@@ -2036,7 +2062,7 @@ if (uni.restoreGlobal) {
         this.callId = options.callId;
         this.fromCallBack = options.fromCallBack === "true";
         if (this.fromCallBack) {
-          formatAppLog("log", "at pages/call/calling.vue:375", "From call-back page, starting timer immediately");
+          formatAppLog("log", "at pages/call/calling.vue:381", "From call-back page, starting timer immediately");
           this.status = "00:00";
           this.internalStatus = "00:00";
           this.callDuration = 0;
@@ -2053,17 +2079,21 @@ if (uni.restoreGlobal) {
       const now = Date.now();
       if (cachedBg && cacheTime && now - cacheTime < 24 * 60 * 60 * 1e3) {
         this.imgUrl = cachedBg;
-        formatAppLog("log", "at pages/call/calling.vue:398", "Using cached background image");
+        this.wallpaperDebugText = "背景来源：缓存壁纸";
+        formatAppLog("log", "at pages/call/calling.vue:405", "Using cached background image");
       } else {
+        this.imgUrl = "/static/images/bg.jpg";
+        this.wallpaperDebugText = "背景来源：默认背景";
         const ret = u7746wallpaper.getBackground("test.png");
         if (ret.code === "1") {
           this.imgUrl = ret.msg;
+          this.wallpaperDebugText = `背景来源：系统壁纸 code=${ret.code}`;
           uni.setStorageSync("cached_background", ret.msg);
           uni.setStorageSync("background_cache_time", now);
-          formatAppLog("log", "at pages/call/calling.vue:407", "Updated background image cache");
+          formatAppLog("log", "at pages/call/calling.vue:418", "Updated background image cache");
         } else {
-          this.imgUrl = "/static/images/bg.jpg";
-          formatAppLog("log", "at pages/call/calling.vue:410", "Using default background image");
+          this.wallpaperDebugText = `背景来源：默认背景 code=${ret.code || "unknown"}`;
+          formatAppLog("log", "at pages/call/calling.vue:421", "Using default background image");
         }
       }
       if (!options.callId) {
@@ -2084,7 +2114,7 @@ if (uni.restoreGlobal) {
         return number;
       },
       startDurationTimer() {
-        formatAppLog("log", "at pages/call/calling.vue:443", "Starting duration timer");
+        formatAppLog("log", "at pages/call/calling.vue:455", "Starting duration timer");
         if (this.durationTimer) {
           clearInterval(this.durationTimer);
         }
@@ -2092,7 +2122,7 @@ if (uni.restoreGlobal) {
         this.durationTimer = setInterval(() => {
           this.callDuration++;
           this.updateCallStatus();
-          formatAppLog("log", "at pages/call/calling.vue:451", "Timer tick:", this.callDuration, "Current status:", this.internalStatus);
+          formatAppLog("log", "at pages/call/calling.vue:463", "Timer tick:", this.callDuration, "Current status:", this.internalStatus);
         }, 1e3);
       },
       updateCallStatus() {
@@ -2100,7 +2130,7 @@ if (uni.restoreGlobal) {
           const minutes = Math.floor(this.callDuration / 60);
           const seconds = this.callDuration % 60;
           const timeString = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-          formatAppLog("log", "at pages/call/calling.vue:460", "Updating status to:", timeString);
+          formatAppLog("log", "at pages/call/calling.vue:472", "Updating status to:", timeString);
           this.status = timeString;
           this.internalStatus = timeString;
         }
@@ -2114,10 +2144,10 @@ if (uni.restoreGlobal) {
           if (index === 7) {
             if (this.ringtonePlayer) {
               this.ringtonePlayer.volume = this.buttons[index].isActive ? 2 : 0.3;
-              formatAppLog("log", "at pages/call/calling.vue:477", "Speaker button toggled, plus.audio.Player volume set to:", this.ringtonePlayer.volume);
+              formatAppLog("log", "at pages/call/calling.vue:489", "Speaker button toggled, plus.audio.Player volume set to:", this.ringtonePlayer.volume);
             } else if (this.ringtoneContext) {
               this.ringtoneContext.volume = this.buttons[index].isActive ? 1 : 0.2;
-              formatAppLog("log", "at pages/call/calling.vue:481", "Speaker button toggled, uni.createInnerAudioContext volume set to:", this.ringtoneContext.volume);
+              formatAppLog("log", "at pages/call/calling.vue:493", "Speaker button toggled, uni.createInnerAudioContext volume set to:", this.ringtoneContext.volume);
             }
           }
         }
@@ -2140,7 +2170,7 @@ if (uni.restoreGlobal) {
         this.status = "正在拨号...";
         try {
           const res = await uni.request({
-            url: "http://106.53.30.150:9097/api/dial",
+            url: phoneApi("/api/dial"),
             method: "POST",
             data: {
               number: this.number.replace(/\s/g, ""),
@@ -2149,8 +2179,8 @@ if (uni.restoreGlobal) {
               location: this.location
             }
           });
-          formatAppLog("log", "at pages/call/calling.vue:514", this.location);
-          formatAppLog("log", "at pages/call/calling.vue:515", "Dial request response:", res);
+          formatAppLog("log", "at pages/call/calling.vue:526", this.location);
+          formatAppLog("log", "at pages/call/calling.vue:527", "Dial request response:", res);
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
             this.callId = (_a = res.data.data) == null ? void 0 : _a.callId;
             this.status = "正在等待对方接听...";
@@ -2164,14 +2194,14 @@ if (uni.restoreGlobal) {
             setTimeout(() => {
               var _a2, _b2;
               Logger.log("navigate", { reason: "dial_request_failed", status: this.internalStatus, callId: this.callId, serverMsg: (_a2 = res.data) == null ? void 0 : _a2.msg });
-              formatAppLog("log", "at pages/call/calling.vue:531", "Navigate due to dial_request_failed", { reason: "dial_request_failed", status: this.internalStatus, callId: this.callId, serverMsg: (_b2 = res.data) == null ? void 0 : _b2.msg });
+              formatAppLog("log", "at pages/call/calling.vue:543", "Navigate due to dial_request_failed", { reason: "dial_request_failed", status: this.internalStatus, callId: this.callId, serverMsg: (_b2 = res.data) == null ? void 0 : _b2.msg });
               uni.switchTab({
                 url: "/pages/dial/dial"
               });
             }, 2e3);
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call/calling.vue:538", "Dial request failed:", error2);
+          formatAppLog("error", "at pages/call/calling.vue:550", "Dial request failed:", error2);
           this.status = "拨号失败";
           uni.showToast({
             title: "网络错误",
@@ -2179,7 +2209,7 @@ if (uni.restoreGlobal) {
           });
           setTimeout(() => {
             Logger.log("navigate", { reason: "dial_request_network_error", status: this.internalStatus, callId: this.callId });
-            formatAppLog("log", "at pages/call/calling.vue:546", "Navigate due to dial_request_network_error", { reason: "dial_request_network_error", status: this.internalStatus, callId: this.callId });
+            formatAppLog("log", "at pages/call/calling.vue:558", "Navigate due to dial_request_network_error", { reason: "dial_request_network_error", status: this.internalStatus, callId: this.callId });
             uni.switchTab({
               url: "/pages/dial/dial"
             });
@@ -2205,18 +2235,18 @@ if (uni.restoreGlobal) {
           return;
         try {
           const res = await uni.request({
-            url: `http://106.53.30.150:9097/api/call-status`,
+            url: phoneApi("/api/call-status"),
             method: "GET",
             data: {
               callId: this.callId
             }
           });
-          formatAppLog("log", "at pages/call/calling.vue:582", "Call status response:", res);
+          formatAppLog("log", "at pages/call/calling.vue:594", "Call status response:", res);
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
             const status = res.data.data.status;
-            formatAppLog("log", "at pages/call/calling.vue:586", "Current call status:", status);
+            formatAppLog("log", "at pages/call/calling.vue:598", "Current call status:", status);
             if (status !== "ringing" && this.isPlayingRingtone) {
-              formatAppLog("log", "at pages/call/calling.vue:590", "Status changed from ringing, stopping ringtone");
+              formatAppLog("log", "at pages/call/calling.vue:602", "Status changed from ringing, stopping ringtone");
               this.stopRingtone();
               this.stopRingtonePolling();
             }
@@ -2227,12 +2257,12 @@ if (uni.restoreGlobal) {
                 break;
               case "connected":
                 if (!this.durationTimer) {
-                  formatAppLog("log", "at pages/call/calling.vue:603", "Call connected, starting timer");
+                  formatAppLog("log", "at pages/call/calling.vue:615", "Call connected, starting timer");
                   this.internalStatus = "00:00";
                   this.startDurationTimer();
                   try {
                     const ringtoneRes = await uni.request({
-                      url: "http://106.53.30.150:9097/api/ringtone-status",
+                      url: phoneApi("/api/ringtone-status"),
                       method: "POST",
                       data: {
                         userId: this.userId,
@@ -2240,43 +2270,43 @@ if (uni.restoreGlobal) {
                       }
                     });
                     if (ringtoneRes.statusCode === 200 && ringtoneRes.data && ringtoneRes.data.code === 0) {
-                      formatAppLog("log", "at pages/call/calling.vue:619", "Successfully updated ringtone status to false for connected call");
+                      formatAppLog("log", "at pages/call/calling.vue:631", "Successfully updated ringtone status to false for connected call");
                     } else {
-                      formatAppLog("error", "at pages/call/calling.vue:621", "Failed to update ringtone status for connected call");
+                      formatAppLog("error", "at pages/call/calling.vue:633", "Failed to update ringtone status for connected call");
                     }
                   } catch (error2) {
-                    formatAppLog("error", "at pages/call/calling.vue:624", "Error updating ringtone status for connected call:", error2);
+                    formatAppLog("error", "at pages/call/calling.vue:636", "Error updating ringtone status for connected call:", error2);
                   }
                 }
                 break;
               case "failed":
-                formatAppLog("log", "at pages/call/calling.vue:629", "Call failed");
+                formatAppLog("log", "at pages/call/calling.vue:641", "Call failed");
                 this.internalStatus = "无法接通";
                 if (this.durationTimer) {
                   clearInterval(this.durationTimer);
                   this.durationTimer = null;
                 }
-                formatAppLog("log", "at pages/call/calling.vue:635", "Navigate due to call_status_failed", { reason: "call_status_failed", status: this.internalStatus, callId: this.callId });
+                formatAppLog("log", "at pages/call/calling.vue:647", "Navigate due to call_status_failed", { reason: "call_status_failed", status: this.internalStatus, callId: this.callId });
                 uni.switchTab({
                   url: "/pages/dial/dial"
                 });
                 break;
               case "canceled":
-                formatAppLog("log", "at pages/call/calling.vue:641", "Call ended with status: canceled");
+                formatAppLog("log", "at pages/call/calling.vue:653", "Call ended with status: canceled");
                 this.internalStatus = "已取消";
                 if (this.durationTimer) {
                   clearInterval(this.durationTimer);
                   this.durationTimer = null;
                 }
                 uni.$emit("callEnded");
-                formatAppLog("log", "at pages/call/calling.vue:649", "Navigate due to call_status_canceled", { reason: "call_status_canceled", status: this.internalStatus, callId: this.callId });
+                formatAppLog("log", "at pages/call/calling.vue:661", "Navigate due to call_status_canceled", { reason: "call_status_canceled", status: this.internalStatus, callId: this.callId });
                 uni.switchTab({
                   url: "/pages/dial/dial"
                 });
                 break;
               case "weijie":
               case "guaduan":
-                formatAppLog("log", "at pages/call/calling.vue:656", "Call ended with status:", status);
+                formatAppLog("log", "at pages/call/calling.vue:668", "Call ended with status:", status);
                 if (this.durationTimer) {
                   clearInterval(this.durationTimer);
                   this.durationTimer = null;
@@ -2288,7 +2318,7 @@ if (uni.restoreGlobal) {
                 uni.$emit("callEnded");
                 break;
               case "disconnected":
-                formatAppLog("log", "at pages/call/calling.vue:671", "Call disconnected");
+                formatAppLog("log", "at pages/call/calling.vue:683", "Call disconnected");
                 this.internalStatus = "通话已结束";
                 this.stopPolling();
                 if (this.durationTimer) {
@@ -2296,13 +2326,13 @@ if (uni.restoreGlobal) {
                   this.durationTimer = null;
                 }
                 uni.$emit("callEnded");
-                formatAppLog("log", "at pages/call/calling.vue:679", "Navigate due to call_status_disconnected", { reason: "call_status_disconnected", status: this.internalStatus, callId: this.callId });
+                formatAppLog("log", "at pages/call/calling.vue:691", "Navigate due to call_status_disconnected", { reason: "call_status_disconnected", status: this.internalStatus, callId: this.callId });
                 uni.switchTab({
                   url: "/pages/dial/dial"
                 });
                 break;
               default:
-                formatAppLog("warn", "at pages/call/calling.vue:685", "Unknown backend call status, will not navigate", { backendStatus: status, callId: this.callId });
+                formatAppLog("warn", "at pages/call/calling.vue:697", "Unknown backend call status, will not navigate", { backendStatus: status, callId: this.callId });
                 if (!this.unknownStatusNotified) {
                   this.unknownStatusNotified = true;
                   uni.showToast({ title: `未知状态：${status}`, icon: "none" });
@@ -2311,55 +2341,55 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call/calling.vue:694", "Failed to check call status:", error2);
+          formatAppLog("error", "at pages/call/calling.vue:706", "Failed to check call status:", error2);
         }
       },
       // 新增：发送挂断请求的方法
       async sendHangupRequest() {
         var _a;
         if (!this.callId) {
-          formatAppLog("log", "at pages/call/calling.vue:700", "No callId, skipping hangup request.");
+          formatAppLog("log", "at pages/call/calling.vue:712", "No callId, skipping hangup request.");
           return;
         }
         if (this.hasSentHangup) {
-          formatAppLog("log", "at pages/call/calling.vue:704", "Hangup already sent, skipping duplicate request.");
+          formatAppLog("log", "at pages/call/calling.vue:716", "Hangup already sent, skipping duplicate request.");
           return;
         }
         this.hasSentHangup = true;
         try {
-          formatAppLog("log", "at pages/call/calling.vue:709", "Sending background hangup request for callId:", this.callId);
+          formatAppLog("log", "at pages/call/calling.vue:721", "Sending background hangup request for callId:", this.callId);
           const res = await uni.request({
-            url: "http://106.53.30.150:9097/api/hangup",
+            url: phoneApi("/api/hangup"),
             method: "POST",
             data: {
               callId: this.callId,
               action: "hangup"
             }
           });
-          formatAppLog("log", "at pages/call/calling.vue:718", "Background hangup response:", res);
+          formatAppLog("log", "at pages/call/calling.vue:730", "Background hangup response:", res);
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
-            formatAppLog("log", "at pages/call/calling.vue:720", "Background hangup successful.");
+            formatAppLog("log", "at pages/call/calling.vue:732", "Background hangup successful.");
           } else {
-            formatAppLog("error", "at pages/call/calling.vue:722", "Background hangup failed:", ((_a = res.data) == null ? void 0 : _a.msg) || "Unknown error");
+            formatAppLog("error", "at pages/call/calling.vue:734", "Background hangup failed:", ((_a = res.data) == null ? void 0 : _a.msg) || "Unknown error");
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call/calling.vue:725", "Error sending background hangup request:", error2);
+          formatAppLog("error", "at pages/call/calling.vue:737", "Error sending background hangup request:", error2);
         }
       },
       endCall() {
-        formatAppLog("log", "at pages/call/calling.vue:729", "endCall called");
+        formatAppLog("log", "at pages/call/calling.vue:741", "endCall called");
         if (this.callId) {
-          formatAppLog("log", "at pages/call/calling.vue:733", "Sending hangup request for callId:", this.callId);
+          formatAppLog("log", "at pages/call/calling.vue:745", "Sending hangup request for callId:", this.callId);
           this.sendHangupRequest();
           uni.$emit("clearDialInput");
           Logger.log("navigate", { reason: "user_end_call", status: this.internalStatus, callId: this.callId });
-          formatAppLog("log", "at pages/call/calling.vue:737", "Navigate due to user_end_call", { reason: "user_end_call", status: this.internalStatus, callId: this.callId });
+          formatAppLog("log", "at pages/call/calling.vue:749", "Navigate due to user_end_call", { reason: "user_end_call", status: this.internalStatus, callId: this.callId });
           uni.switchTab({
             url: "/pages/dial/dial"
           });
-          formatAppLog("log", "at pages/call/calling.vue:741", "Hangup request initiated. Switching to dial page.");
+          formatAppLog("log", "at pages/call/calling.vue:753", "Hangup request initiated. Switching to dial page.");
         } else {
-          formatAppLog("log", "at pages/call/calling.vue:744", "No callId, switching to dial page.");
+          formatAppLog("log", "at pages/call/calling.vue:756", "No callId, switching to dial page.");
           uni.switchTab({
             url: "/pages/dial/dial"
           });
@@ -2381,7 +2411,7 @@ if (uni.restoreGlobal) {
         this.ringtoneStartTime = null;
         try {
           const res = await uni.request({
-            url: "http://106.53.30.150:9097/api/ringtone-status",
+            url: phoneApi("/api/ringtone-status"),
             method: "POST",
             data: {
               userId: this.userId,
@@ -2389,38 +2419,38 @@ if (uni.restoreGlobal) {
             }
           });
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
-            formatAppLog("log", "at pages/call/calling.vue:782", "Successfully updated ringtone status to false");
+            formatAppLog("log", "at pages/call/calling.vue:794", "Successfully updated ringtone status to false");
           } else {
-            formatAppLog("error", "at pages/call/calling.vue:784", "Failed to update ringtone status");
+            formatAppLog("error", "at pages/call/calling.vue:796", "Failed to update ringtone status");
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call/calling.vue:787", "Error updating ringtone status:", error2);
+          formatAppLog("error", "at pages/call/calling.vue:799", "Error updating ringtone status:", error2);
         }
         await this.sendHangupRequest();
         uni.$emit("clearDialInput");
         Logger.log("navigate", { reason: "ringtone_timeout", status: this.internalStatus, callId: this.callId });
-        formatAppLog("log", "at pages/call/calling.vue:796", "Navigate due to ringtone_timeout", { reason: "ringtone_timeout", status: this.internalStatus, callId: this.callId });
+        formatAppLog("log", "at pages/call/calling.vue:808", "Navigate due to ringtone_timeout", { reason: "ringtone_timeout", status: this.internalStatus, callId: this.callId });
         uni.switchTab({
           url: "/pages/dial/dial"
         });
       },
       async playRandomRingtone() {
-        formatAppLog("log", "at pages/call/calling.vue:802", "playRandomRingtone called");
+        formatAppLog("log", "at pages/call/calling.vue:814", "playRandomRingtone called");
         if (!this.ringtoneContext) {
-          formatAppLog("warn", "at pages/call/calling.vue:804", "ringtoneContext not available, cannot play ringtone.");
+          formatAppLog("warn", "at pages/call/calling.vue:816", "ringtoneContext not available, cannot play ringtone.");
           return;
         }
         if (this.ringtoneStartTime) {
           const currentTime = Math.floor(Date.now() / 1e3);
           const elapsedTime = currentTime - this.ringtoneStartTime;
           if (elapsedTime >= this.maxRingtoneDuration) {
-            formatAppLog("log", "at pages/call/calling.vue:814", "Maximum ringtone duration reached, stopping playback");
+            formatAppLog("log", "at pages/call/calling.vue:826", "Maximum ringtone duration reached, stopping playback");
             await this.stopRingtoneAndNavigate();
             return;
           }
         } else {
           this.ringtoneStartTime = Math.floor(Date.now() / 1e3);
-          formatAppLog("log", "at pages/call/calling.vue:821", "Starting ringtone playback timer");
+          formatAppLog("log", "at pages/call/calling.vue:833", "Starting ringtone playback timer");
         }
         const cleanedNumber = this.number.replace(/\s/g, "");
         const todayString = this.getCurrentDateString();
@@ -2431,7 +2461,7 @@ if (uni.restoreGlobal) {
         if (preferences[cleanedNumber] && preferences[cleanedNumber].date === todayString) {
           this.selectedRingtone = preferences[cleanedNumber].ringtoneUrl;
           useStoredRingtone = true;
-          formatAppLog("log", "at pages/call/calling.vue:838", `Using stored ringtone for ${cleanedNumber} for today: ${this.selectedRingtone}`);
+          formatAppLog("log", "at pages/call/calling.vue:850", `Using stored ringtone for ${cleanedNumber} for today: ${this.selectedRingtone}`);
         }
         if (!useStoredRingtone) {
           const randomIndex = Math.floor(Math.random() * this.ringtoneList.length);
@@ -2441,15 +2471,15 @@ if (uni.restoreGlobal) {
             date: todayString
           };
           uni.setStorageSync(storageKey, JSON.stringify(preferences));
-          formatAppLog("log", "at pages/call/calling.vue:852", `Selected random ringtone for ${cleanedNumber} and stored for today: ${this.selectedRingtone}`);
+          formatAppLog("log", "at pages/call/calling.vue:864", `Selected random ringtone for ${cleanedNumber} and stored for today: ${this.selectedRingtone}`);
         }
         this.ringtoneContext.src = this.selectedRingtone;
         this.ringtoneContext.volume = this.buttons[7].isActive ? 1 : 0.2;
         this.ringtoneContext.play();
-        formatAppLog("log", "at pages/call/calling.vue:859", "Attempting to play ringtone:", this.selectedRingtone, "with volume:", this.ringtoneContext.volume);
+        formatAppLog("log", "at pages/call/calling.vue:871", "Attempting to play ringtone:", this.selectedRingtone, "with volume:", this.ringtoneContext.volume);
         try {
           const res = await uni.request({
-            url: "http://106.53.30.150:9097/api/ringtone-status",
+            url: phoneApi("/api/ringtone-status"),
             method: "POST",
             data: {
               userId: this.userId,
@@ -2457,46 +2487,46 @@ if (uni.restoreGlobal) {
             }
           });
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
-            formatAppLog("log", "at pages/call/calling.vue:873", "Successfully updated ringtone status on server");
+            formatAppLog("log", "at pages/call/calling.vue:885", "Successfully updated ringtone status on server");
           } else {
-            formatAppLog("error", "at pages/call/calling.vue:875", "Failed to update ringtone status:", error);
+            formatAppLog("error", "at pages/call/calling.vue:887", "Failed to update ringtone status:", error);
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call/calling.vue:878", "Error updating ringtone status:", error2);
+          formatAppLog("error", "at pages/call/calling.vue:890", "Error updating ringtone status:", error2);
         }
         if (!this.ringtoneDurationTimer) {
           this.ringtoneDurationTimer = setInterval(async () => {
             const currentTime = Math.floor(Date.now() / 1e3);
             const elapsedTime = currentTime - this.ringtoneStartTime;
             if (elapsedTime >= this.maxRingtoneDuration) {
-              formatAppLog("log", "at pages/call/calling.vue:888", "Maximum ringtone duration reached via timer, stopping playback");
+              formatAppLog("log", "at pages/call/calling.vue:900", "Maximum ringtone duration reached via timer, stopping playback");
               await this.stopRingtoneAndNavigate();
             }
           }, 1e3);
         }
       },
       playEndCallMusic(status) {
-        formatAppLog("log", "at pages/call/calling.vue:895", "playEndCallMusic called");
-        formatAppLog("log", "at pages/call/calling.vue:896", status);
+        formatAppLog("log", "at pages/call/calling.vue:907", "playEndCallMusic called");
+        formatAppLog("log", "at pages/call/calling.vue:908", status);
         if (status === "guaduan") {
-          formatAppLog("log", "at pages/call/calling.vue:899", "Call transferred, switching to dial page");
+          formatAppLog("log", "at pages/call/calling.vue:911", "Call transferred, switching to dial page");
           uni.$emit("clearDialInput");
           Logger.log("navigate", { reason: "call_status_guaduan", status: this.internalStatus, callId: this.callId });
-          formatAppLog("log", "at pages/call/calling.vue:903", "Navigate due to call_status_guaduan", { reason: "call_status_guaduan", status: this.internalStatus, callId: this.callId });
+          formatAppLog("log", "at pages/call/calling.vue:915", "Navigate due to call_status_guaduan", { reason: "call_status_guaduan", status: this.internalStatus, callId: this.callId });
           uni.switchTab({
             url: "/pages/dial/dial"
           });
         } else if (status === "weijie") {
           const endMusic = "/static/audio/end-call2.mp3";
-          formatAppLog("log", "at pages/call/calling.vue:910", "Playing end call music:", endMusic);
+          formatAppLog("log", "at pages/call/calling.vue:922", "Playing end call music:", endMusic);
           this.endCallContext.src = endMusic;
-          formatAppLog("log", "at pages/call/calling.vue:912", "Playing end call music:", endMusic);
+          formatAppLog("log", "at pages/call/calling.vue:924", "Playing end call music:", endMusic);
           this.endCallContext.src = endMusic;
           this.endCallContext.onEnded(() => {
-            formatAppLog("log", "at pages/call/calling.vue:917", "End call music finished playing");
+            formatAppLog("log", "at pages/call/calling.vue:929", "End call music finished playing");
             uni.$emit("clearDialInput");
             Logger.log("navigate", { reason: "end_music_finished", status: this.internalStatus, callId: this.callId });
-            formatAppLog("log", "at pages/call/calling.vue:921", "Navigate due to end_music_finished", { reason: "end_music_finished", status: this.internalStatus, callId: this.callId });
+            formatAppLog("log", "at pages/call/calling.vue:933", "Navigate due to end_music_finished", { reason: "end_music_finished", status: this.internalStatus, callId: this.callId });
             uni.switchTab({
               url: "/pages/dial/dial"
             });
@@ -2507,7 +2537,7 @@ if (uni.restoreGlobal) {
             }
             uni.$emit("clearDialInput");
             Logger.log("navigate", { reason: "end_music_timeout", status: this.internalStatus, callId: this.callId });
-            formatAppLog("log", "at pages/call/calling.vue:936", "Navigate due to end_music_timeout", { reason: "end_music_timeout", status: this.internalStatus, callId: this.callId });
+            formatAppLog("log", "at pages/call/calling.vue:948", "Navigate due to end_music_timeout", { reason: "end_music_timeout", status: this.internalStatus, callId: this.callId });
             uni.switchTab({
               url: "/pages/dial/dial"
             });
@@ -2516,17 +2546,17 @@ if (uni.restoreGlobal) {
         }
       },
       async checkContactAndDisplay(number, defaultLocation) {
-        formatAppLog("log", "at pages/call/calling.vue:948", "checkContactAndDisplay: Processing number:", number);
+        formatAppLog("log", "at pages/call/calling.vue:960", "checkContactAndDisplay: Processing number:", number);
         const cleanedNumber = number.replace(/\s/g, "");
         if (!cleanedNumber) {
-          formatAppLog("log", "at pages/call/calling.vue:951", "checkContactAndDisplay: Invalid number. Using original display.");
+          formatAppLog("log", "at pages/call/calling.vue:963", "checkContactAndDisplay: Invalid number. Using original display.");
           this.number = this.formatPhoneNumber(number);
           this.location = defaultLocation || "未知位置";
           return;
         }
         try {
-          const apiUrl = `http://106.53.30.150:9097/api/contact`;
-          formatAppLog("log", "at pages/call/calling.vue:960", "checkContactAndDisplay: Calling API:", apiUrl, "with phone:", cleanedNumber);
+          const apiUrl = phoneApi("/api/contact");
+          formatAppLog("log", "at pages/call/calling.vue:972", "checkContactAndDisplay: Calling API:", apiUrl, "with phone:", cleanedNumber);
           const res = await uni.request({
             url: apiUrl,
             method: "POST",
@@ -2535,19 +2565,19 @@ if (uni.restoreGlobal) {
               phone: cleanedNumber
             }
           });
-          formatAppLog("log", "at pages/call/calling.vue:968", "checkContactAndDisplay: API response:", res);
+          formatAppLog("log", "at pages/call/calling.vue:980", "checkContactAndDisplay: API response:", res);
           if (res.statusCode === 200 && res.data && res.data.code === 0 && res.data.data) {
-            formatAppLog("log", "at pages/call/calling.vue:972", "checkContactAndDisplay: Contact found. Updating display.");
+            formatAppLog("log", "at pages/call/calling.vue:984", "checkContactAndDisplay: Contact found. Updating display.");
             this.number = res.data.data.name;
             this.location = this.formatPhoneNumber(res.data.data.phone);
-            formatAppLog("log", "at pages/call/calling.vue:975", "checkContactAndDisplay: Updated display number to:", this.number, "location to:", this.location);
+            formatAppLog("log", "at pages/call/calling.vue:987", "checkContactAndDisplay: Updated display number to:", this.number, "location to:", this.location);
           } else {
-            formatAppLog("log", "at pages/call/calling.vue:978", "checkContactAndDisplay: Contact not found or API issue. Keeping original display.");
+            formatAppLog("log", "at pages/call/calling.vue:990", "checkContactAndDisplay: Contact not found or API issue. Keeping original display.");
             this.number = this.formatPhoneNumber(number);
             this.location = defaultLocation || "未知位置";
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call/calling.vue:984", "checkContactAndDisplay: Failed to check contact API:", error2);
+          formatAppLog("error", "at pages/call/calling.vue:996", "checkContactAndDisplay: Failed to check contact API:", error2);
           this.number = this.formatPhoneNumber(number);
           this.location = defaultLocation || "未知位置";
         }
@@ -2555,7 +2585,7 @@ if (uni.restoreGlobal) {
       startRingtonePolling() {
         this.stopRingtonePolling();
         if (this.internalStatus === "正在等待对方接听...") {
-          formatAppLog("log", "at pages/call/calling.vue:996", "Starting ringtone polling for ringing state");
+          formatAppLog("log", "at pages/call/calling.vue:1008", "Starting ringtone polling for ringing state");
           this.ringtonePollTimer = setInterval(() => {
             this.checkRingtoneStatus();
           }, 1e3);
@@ -2569,12 +2599,12 @@ if (uni.restoreGlobal) {
       },
       async checkRingtoneStatus() {
         if (this.internalStatus !== "正在等待对方接听...") {
-          formatAppLog("log", "at pages/call/calling.vue:1011", "Not in ringing state, skipping ringtone check");
+          formatAppLog("log", "at pages/call/calling.vue:1023", "Not in ringing state, skipping ringtone check");
           return;
         }
         try {
           const res = await uni.request({
-            url: "http://106.53.30.150:9097/api/ringtone-status",
+            url: phoneApi("/api/ringtone-status"),
             method: "GET",
             data: {
               userId: this.userId
@@ -2583,7 +2613,7 @@ if (uni.restoreGlobal) {
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
             const { isPlaying, lastUpdateTime, userId } = res.data.data;
             if (lastUpdateTime > this.lastRingtoneUpdateTime && isPlaying !== this.isPlayingRingtone && userId === this.userId) {
-              formatAppLog("log", "at pages/call/calling.vue:1030", "Ringtone status changed:", isPlaying);
+              formatAppLog("log", "at pages/call/calling.vue:1042", "Ringtone status changed:", isPlaying);
               this.lastRingtoneUpdateTime = lastUpdateTime;
               this.isPlayingRingtone = isPlaying;
               if (isPlaying) {
@@ -2594,7 +2624,7 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call/calling.vue:1042", "Failed to check ringtone status:", error2);
+          formatAppLog("error", "at pages/call/calling.vue:1054", "Failed to check ringtone status:", error2);
         }
       },
       // Helper method to get current date in YYYY-MM-DD format
@@ -2627,18 +2657,18 @@ if (uni.restoreGlobal) {
         if (this.durationTimer) {
           clearInterval(this.durationTimer);
           this.durationTimer = null;
-          formatAppLog("log", "at pages/call/calling.vue:1074", "Duration timer stopped.");
+          formatAppLog("log", "at pages/call/calling.vue:1086", "Duration timer stopped.");
         }
       },
       // 修改 stopRingtone 方法，确保完全停止铃声和相关状态
       stopRingtone() {
-        formatAppLog("log", "at pages/call/calling.vue:1079", "Stopping ringtone");
+        formatAppLog("log", "at pages/call/calling.vue:1091", "Stopping ringtone");
         if (this.ringtoneContext) {
           try {
             this.ringtoneContext.stop();
-            formatAppLog("log", "at pages/call/calling.vue:1083", "Ringtone stopped successfully");
+            formatAppLog("log", "at pages/call/calling.vue:1095", "Ringtone stopped successfully");
           } catch (error2) {
-            formatAppLog("error", "at pages/call/calling.vue:1085", "Error stopping ringtone:", error2);
+            formatAppLog("error", "at pages/call/calling.vue:1097", "Error stopping ringtone:", error2);
           }
         }
         if (this.ringtoneDurationTimer) {
@@ -2659,7 +2689,7 @@ if (uni.restoreGlobal) {
         try {
           const userId = uni.getStorageSync("userId") || 6;
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/call-records",
+            url: phoneApi("/api/call-records"),
             method: "GET",
             data: {
               userId,
@@ -2677,10 +2707,10 @@ if (uni.restoreGlobal) {
               status: this.mapCallStatus(record.status)
             }));
             uni.setStorageSync("preloaded_call_records", records);
-            formatAppLog("log", "at pages/call/calling.vue:1131", "Successfully preloaded call records");
+            formatAppLog("log", "at pages/call/calling.vue:1143", "Successfully preloaded call records");
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call/calling.vue:1134", "Failed to preload call records:", error2);
+          formatAppLog("error", "at pages/call/calling.vue:1146", "Failed to preload call records:", error2);
         }
       },
       // 添加格式化时间的方法
@@ -2718,11 +2748,11 @@ if (uni.restoreGlobal) {
         this.audioContext = null;
       }
       if (this.ringtoneContext) {
-        formatAppLog("log", "at pages/call/calling.vue:1175", "Attempting to destroy ringtoneContext instance.");
+        formatAppLog("log", "at pages/call/calling.vue:1187", "Attempting to destroy ringtoneContext instance.");
         try {
           this.ringtoneContext.destroy();
         } catch (error2) {
-          formatAppLog("error", "at pages/call/calling.vue:1179", "Error destroying ringtoneContext:", error2);
+          formatAppLog("error", "at pages/call/calling.vue:1191", "Error destroying ringtoneContext:", error2);
         }
         this.ringtoneContext = null;
       }
@@ -2731,14 +2761,14 @@ if (uni.restoreGlobal) {
         this.endCallContext = null;
       }
       if (this.callAudioPlayer) {
-        formatAppLog("log", "at pages/call/calling.vue:1189", "Cleaning up callAudioPlayer instance.");
+        formatAppLog("log", "at pages/call/calling.vue:1201", "Cleaning up callAudioPlayer instance.");
         this.callAudioPlayer = null;
       }
       this.stopRingtonePolling();
       if (this.navigateBackTimeout) {
         clearTimeout(this.navigateBackTimeout);
         this.navigateBackTimeout = null;
-        formatAppLog("log", "at pages/call/calling.vue:1198", "Cleared navigation timeout in onUnload.");
+        formatAppLog("log", "at pages/call/calling.vue:1210", "Cleared navigation timeout in onUnload.");
       }
       if (this.ringtoneTimeout) {
         clearTimeout(this.ringtoneTimeout);
@@ -2766,6 +2796,13 @@ if (uni.restoreGlobal) {
         class: "bg-img",
         mode: "aspectFill"
       }, null, 8, ["src"]),
+      vue.createElementVNode(
+        "view",
+        { class: "debug-bg-source" },
+        vue.toDisplayString($data.wallpaperDebugText),
+        1
+        /* TEXT */
+      ),
       vue.createElementVNode("view", { class: "call-content" }, [
         vue.createElementVNode(
           "view",
@@ -2944,6 +2981,35 @@ if (uni.restoreGlobal) {
   }
   const PagesCallCalling = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-620547d8"], ["__file", "C:/Coding/phone-web/phone/pages/call/calling.vue"]]);
   const _imports_0$5 = "/static/icons/lxr.png";
+  const CP1252_BYTE_MAP = {
+    8364: 128,
+    8218: 130,
+    402: 131,
+    8222: 132,
+    8230: 133,
+    8224: 134,
+    8225: 135,
+    710: 136,
+    8240: 137,
+    352: 138,
+    8249: 139,
+    338: 140,
+    381: 142,
+    8216: 145,
+    8217: 146,
+    8220: 147,
+    8221: 148,
+    8226: 149,
+    8211: 150,
+    8212: 151,
+    732: 152,
+    8482: 153,
+    353: 154,
+    8250: 155,
+    339: 156,
+    382: 158,
+    376: 159
+  };
   const _sfc_main$8 = {
     data() {
       return {
@@ -2954,18 +3020,82 @@ if (uni.restoreGlobal) {
       this.fetchContacts();
     },
     methods: {
+      decodeUtf8Bytes(bytes) {
+        let result = "";
+        for (let i = 0; i < bytes.length; i += 1) {
+          const byte1 = bytes[i];
+          if (byte1 < 128) {
+            result += String.fromCharCode(byte1);
+            continue;
+          }
+          if ((byte1 & 224) === 192 && i + 1 < bytes.length) {
+            const byte2 = bytes[i + 1];
+            result += String.fromCharCode((byte1 & 31) << 6 | byte2 & 63);
+            i += 1;
+            continue;
+          }
+          if ((byte1 & 240) === 224 && i + 2 < bytes.length) {
+            const byte2 = bytes[i + 1];
+            const byte3 = bytes[i + 2];
+            result += String.fromCharCode(
+              (byte1 & 15) << 12 | (byte2 & 63) << 6 | byte3 & 63
+            );
+            i += 2;
+            continue;
+          }
+          if ((byte1 & 248) === 240 && i + 3 < bytes.length) {
+            const byte2 = bytes[i + 1];
+            const byte3 = bytes[i + 2];
+            const byte4 = bytes[i + 3];
+            const codePoint = (byte1 & 7) << 18 | (byte2 & 63) << 12 | (byte3 & 63) << 6 | byte4 & 63;
+            const offset = codePoint - 65536;
+            result += String.fromCharCode(
+              55296 + (offset >> 10),
+              56320 + (offset & 1023)
+            );
+            i += 3;
+            continue;
+          }
+          throw new Error(`invalid-utf8-byte:${byte1}`);
+        }
+        return result;
+      },
+      fixGarbledText(text) {
+        if (typeof text !== "string" || !text) {
+          return text;
+        }
+        try {
+          const bytes = Array.from(text).map((char) => {
+            const code = char.charCodeAt(0);
+            if (code <= 255) {
+              return code;
+            }
+            if (CP1252_BYTE_MAP[code] !== void 0) {
+              return CP1252_BYTE_MAP[code];
+            }
+            throw new Error(`unsupported-char:${code}`);
+          });
+          const decoded = this.decodeUtf8Bytes(bytes);
+          return decoded || text;
+        } catch (error2) {
+          return text;
+        }
+      },
       async fetchContacts() {
         try {
           const response = await uni.request({
-            url: `http://106.53.30.150:9097/api/contacts`,
+            url: phoneApi("/api/contacts"),
             method: "GET"
           });
           if (response.data.code === 0) {
-            this.contacts = response.data.data;
+            this.contacts = (response.data.data || []).map((contact) => ({
+              ...contact,
+              name: this.fixGarbledText(contact.name)
+            }));
           } else {
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/contacts/contacts.vue:47", "获取联系人失败:", error2);
+          formatAppLog("error", "at pages/contacts/contacts.vue:161", "获取联系人失败:", error2);
         }
       }
     }
@@ -2987,32 +3117,47 @@ if (uni.restoreGlobal) {
         32
         /* NEED_HYDRATION */
       ),
-      vue.createElementVNode("view", { class: "contacts-empty" }, [
+      $data.contacts.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 0,
+        class: "contacts-empty"
+      }, [
         vue.createElementVNode("image", {
           src: _imports_0$5,
           class: "contacts-empty-icon"
         }),
         vue.createElementVNode("view", { class: "contacts-empty-text" }, "您还没有任何联系人")
-      ]),
-      (vue.openBlock(true), vue.createElementBlock(
-        vue.Fragment,
-        null,
-        vue.renderList($data.contacts, (contact) => {
-          return vue.openBlock(), vue.createElementBlock("view", {
-            key: contact.id
-          }, [
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString(contact.name) + " - " + vue.toDisplayString(contact.phone),
-              1
-              /* TEXT */
-            )
-          ]);
-        }),
-        128
-        /* KEYED_FRAGMENT */
-      ))
+      ])) : (vue.openBlock(), vue.createElementBlock("view", {
+        key: 1,
+        class: "contacts-list"
+      }, [
+        (vue.openBlock(true), vue.createElementBlock(
+          vue.Fragment,
+          null,
+          vue.renderList($data.contacts, (contact) => {
+            return vue.openBlock(), vue.createElementBlock("view", {
+              key: contact.id,
+              class: "contact-item"
+            }, [
+              vue.createElementVNode(
+                "text",
+                { class: "contact-name" },
+                vue.toDisplayString(contact.name),
+                1
+                /* TEXT */
+              ),
+              vue.createElementVNode(
+                "text",
+                { class: "contact-phone" },
+                vue.toDisplayString(contact.phone),
+                1
+                /* TEXT */
+              )
+            ]);
+          }),
+          128
+          /* KEYED_FRAGMENT */
+        ))
+      ]))
     ]);
   }
   const PagesContactsContacts = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-90a1bbf6"], ["__file", "C:/Coding/phone-web/phone/pages/contacts/contacts.vue"]]);
@@ -3051,6 +3196,7 @@ if (uni.restoreGlobal) {
     data() {
       return {
         imgUrl: "",
+        wallpaperDebugText: "背景来源：未初始化",
         number: "186 8828 2571",
         location: "广东佛山 联通",
         status: "",
@@ -3145,11 +3291,11 @@ if (uni.restoreGlobal) {
       this.audioContext.onEnded(() => {
       });
       this.audioContext.onError((res) => {
-        formatAppLog("error", "at pages/call-back/call-back.vue:139", "Audio Error:", res.errMsg);
+        formatAppLog("error", "at pages/call-back/call-back.vue:145", "Audio Error:", res.errMsg);
       });
       this.endCallContext = uni.createInnerAudioContext();
       this.endCallContext.onError((res) => {
-        formatAppLog("error", "at pages/call-back/call-back.vue:145", "End Call Music Error:", res.errMsg);
+        formatAppLog("error", "at pages/call-back/call-back.vue:151", "End Call Music Error:", res.errMsg);
       });
       if (options.number) {
         this.number = decodeURIComponent(options.number);
@@ -3167,12 +3313,15 @@ if (uni.restoreGlobal) {
       if (options.dialerUserId) {
         this.userId = options.dialerUserId;
       }
+      this.imgUrl = "/static/images/bg.jpg";
+      this.wallpaperDebugText = "背景来源：默认背景";
       const ret = u7746wallpaper.getBackground("test.png");
-      formatAppLog("log", "at pages/call-back/call-back.vue:170", ret);
+      formatAppLog("log", "at pages/call-back/call-back.vue:179", ret);
       if (ret.code === "1") {
         this.imgUrl = ret.msg;
+        this.wallpaperDebugText = `背景来源：系统壁纸 code=${ret.code}`;
       } else {
-        this.imgUrl = "/static/images/bg.jpg";
+        this.wallpaperDebugText = `背景来源：默认背景 code=${ret.code || "unknown"}`;
       }
       if (!options.callId) {
         this.sendDialRequest();
@@ -3273,7 +3422,7 @@ if (uni.restoreGlobal) {
         this.status = "正在拨号...";
         try {
           const res = await uni.request({
-            url: "http://106.53.30.150:9097/api/dial",
+            url: phoneApi("/api/dial"),
             method: "POST",
             data: {
               number: this.number.replace(/\s/g, ""),
@@ -3284,8 +3433,8 @@ if (uni.restoreGlobal) {
               // 添加归属地信息
             }
           });
-          formatAppLog("log", "at pages/call-back/call-back.vue:272", this.location);
-          formatAppLog("log", "at pages/call-back/call-back.vue:273", "Dial request response:", res);
+          formatAppLog("log", "at pages/call-back/call-back.vue:283", this.location);
+          formatAppLog("log", "at pages/call-back/call-back.vue:284", "Dial request response:", res);
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
             this.callId = (_a = res.data.data) == null ? void 0 : _a.callId;
             this.status = "正在等待对方接听...";
@@ -3301,7 +3450,7 @@ if (uni.restoreGlobal) {
             }, 2e3);
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call-back/call-back.vue:292", "Dial request failed:", error2);
+          formatAppLog("error", "at pages/call-back/call-back.vue:303", "Dial request failed:", error2);
           this.status = "拨号失败";
           uni.showToast({
             title: "网络错误",
@@ -3331,16 +3480,16 @@ if (uni.restoreGlobal) {
           return;
         try {
           const res = await uni.request({
-            url: `http://106.53.30.150:9097/api/call-status`,
+            url: phoneApi("/api/call-status"),
             method: "GET",
             data: {
               callId: this.callId
             }
           });
-          formatAppLog("log", "at pages/call-back/call-back.vue:332", "Call status response:", res);
+          formatAppLog("log", "at pages/call-back/call-back.vue:343", "Call status response:", res);
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
             const status = res.data.data.status;
-            formatAppLog("log", "at pages/call-back/call-back.vue:336", "Current call status:", status);
+            formatAppLog("log", "at pages/call-back/call-back.vue:347", "Current call status:", status);
             this.status = status;
             switch (status) {
               case "ringing":
@@ -3348,12 +3497,12 @@ if (uni.restoreGlobal) {
               case "connected":
                 this.stopRingtone();
                 if (!this.durationTimer) {
-                  formatAppLog("log", "at pages/call-back/call-back.vue:347", "Call connected, starting timer");
+                  formatAppLog("log", "at pages/call-back/call-back.vue:358", "Call connected, starting timer");
                   this.startDurationTimer();
                 }
                 break;
               case "failed":
-                formatAppLog("log", "at pages/call-back/call-back.vue:352", "Call failed");
+                formatAppLog("log", "at pages/call-back/call-back.vue:363", "Call failed");
                 if (this.durationTimer) {
                   clearInterval(this.durationTimer);
                   this.durationTimer = null;
@@ -3363,7 +3512,7 @@ if (uni.restoreGlobal) {
                 }, 1e3);
                 break;
               case "canceled":
-                formatAppLog("log", "at pages/call-back/call-back.vue:362", "Call ended with status:", status);
+                formatAppLog("log", "at pages/call-back/call-back.vue:373", "Call ended with status:", status);
                 this.stopRingtone();
                 if (this.durationTimer) {
                   clearInterval(this.durationTimer);
@@ -3375,7 +3524,7 @@ if (uni.restoreGlobal) {
                 }, 1e3);
                 break;
               case "disconnected":
-                formatAppLog("log", "at pages/call-back/call-back.vue:374", "Call disconnected");
+                formatAppLog("log", "at pages/call-back/call-back.vue:385", "Call disconnected");
                 this.stopPolling();
                 if (this.durationTimer) {
                   clearInterval(this.durationTimer);
@@ -3387,7 +3536,7 @@ if (uni.restoreGlobal) {
                 }, 1e3);
                 break;
               default:
-                formatAppLog("log", "at pages/call-back/call-back.vue:386", "Call ended with status:", status);
+                formatAppLog("log", "at pages/call-back/call-back.vue:397", "Call ended with status:", status);
                 this.stopPolling();
                 if (this.durationTimer) {
                   clearInterval(this.durationTimer);
@@ -3401,7 +3550,7 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call-back/call-back.vue:400", "Failed to check call status:", error2);
+          formatAppLog("error", "at pages/call-back/call-back.vue:411", "Failed to check call status:", error2);
         }
       },
       endCall() {
@@ -3413,7 +3562,7 @@ if (uni.restoreGlobal) {
         this.stopRingtone();
         if (this.callId) {
           uni.request({
-            url: "http://106.53.30.150:9097/api/hangup",
+            url: phoneApi("/api/hangup"),
             method: "POST",
             data: {
               callId: this.callId,
@@ -3434,7 +3583,7 @@ if (uni.restoreGlobal) {
               }
             },
             fail: (err) => {
-              formatAppLog("error", "at pages/call-back/call-back.vue:442", "Failed to hangup call:", err);
+              formatAppLog("error", "at pages/call-back/call-back.vue:453", "Failed to hangup call:", err);
               uni.showToast({
                 title: "挂断失败",
                 icon: "none"
@@ -3456,10 +3605,10 @@ if (uni.restoreGlobal) {
         }
       },
       playRandomRingtone() {
-        formatAppLog("log", "at pages/call-back/call-back.vue:470", "Ringtone playback disabled in call-back page");
+        formatAppLog("log", "at pages/call-back/call-back.vue:481", "Ringtone playback disabled in call-back page");
       },
       stopRingtone() {
-        formatAppLog("log", "at pages/call-back/call-back.vue:475", "Ringtone stop disabled in call-back page");
+        formatAppLog("log", "at pages/call-back/call-back.vue:486", "Ringtone stop disabled in call-back page");
       },
       playEndCallMusic() {
         if (!this.endCallContext)
@@ -3488,7 +3637,7 @@ if (uni.restoreGlobal) {
       async checkRingtoneStatus() {
         try {
           const res = await uni.request({
-            url: "http://106.53.30.150:9097/api/ringtone-status",
+            url: phoneApi("/api/ringtone-status"),
             method: "GET",
             data: {
               userId: this.userId
@@ -3498,25 +3647,25 @@ if (uni.restoreGlobal) {
           if (res.statusCode === 200 && res.data && res.data.code === 0) {
             const { isPlaying, lastUpdateTime, userId } = res.data.data;
             if (lastUpdateTime > this.lastRingtoneUpdateTime && isPlaying !== this.isPlayingRingtone && userId === this.userId) {
-              formatAppLog("log", "at pages/call-back/call-back.vue:526", "Ringtone status changed:", isPlaying);
+              formatAppLog("log", "at pages/call-back/call-back.vue:537", "Ringtone status changed:", isPlaying);
               this.lastRingtoneUpdateTime = lastUpdateTime;
               this.isPlayingRingtone = isPlaying;
             }
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call-back/call-back.vue:532", "Failed to check ringtone status:", error2);
+          formatAppLog("error", "at pages/call-back/call-back.vue:543", "Failed to check ringtone status:", error2);
         }
       },
       async checkContactAndDisplay(number) {
-        formatAppLog("log", "at pages/call-back/call-back.vue:536", "checkContactAndDisplay: Processing number:", number);
+        formatAppLog("log", "at pages/call-back/call-back.vue:547", "checkContactAndDisplay: Processing number:", number);
         const cleanedNumber = number.replace(/\s/g, "");
         if (!cleanedNumber) {
-          formatAppLog("log", "at pages/call-back/call-back.vue:539", "checkContactAndDisplay: Invalid number. Using original.");
+          formatAppLog("log", "at pages/call-back/call-back.vue:550", "checkContactAndDisplay: Invalid number. Using original.");
           return;
         }
         try {
-          const apiUrl = `http://106.53.30.150:9097/api/contact`;
-          formatAppLog("log", "at pages/call-back/call-back.vue:545", "checkContactAndDisplay: Calling API:", apiUrl, "with phone:", cleanedNumber);
+          const apiUrl = phoneApi("/api/contact");
+          formatAppLog("log", "at pages/call-back/call-back.vue:556", "checkContactAndDisplay: Calling API:", apiUrl, "with phone:", cleanedNumber);
           const res = await uni.request({
             url: apiUrl,
             method: "POST",
@@ -3524,17 +3673,17 @@ if (uni.restoreGlobal) {
               phone: cleanedNumber
             }
           });
-          formatAppLog("log", "at pages/call-back/call-back.vue:553", "checkContactAndDisplay: API response:", res);
+          formatAppLog("log", "at pages/call-back/call-back.vue:564", "checkContactAndDisplay: API response:", res);
           if (res.statusCode === 200 && res.data && res.data.code === 0 && res.data.data) {
-            formatAppLog("log", "at pages/call-back/call-back.vue:557", "checkContactAndDisplay: Contact found.", res.data.data.phone);
+            formatAppLog("log", "at pages/call-back/call-back.vue:568", "checkContactAndDisplay: Contact found.", res.data.data.phone);
             this.number = res.data.data.name;
             this.location = res.data.data.phone;
-            formatAppLog("log", "at pages/call-back/call-back.vue:560", "checkContactAndDisplay: Updated display number to:", this.number, "location to:", this.location);
+            formatAppLog("log", "at pages/call-back/call-back.vue:571", "checkContactAndDisplay: Updated display number to:", this.number, "location to:", this.location);
           } else {
-            formatAppLog("log", "at pages/call-back/call-back.vue:563", "checkContactAndDisplay: Contact not found or API issue.");
+            formatAppLog("log", "at pages/call-back/call-back.vue:574", "checkContactAndDisplay: Contact not found or API issue.");
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call-back/call-back.vue:566", "checkContactAndDisplay: Failed to check contact API:", error2);
+          formatAppLog("error", "at pages/call-back/call-back.vue:577", "checkContactAndDisplay: Failed to check contact API:", error2);
         }
       },
       // 修改接听方法
@@ -3546,7 +3695,7 @@ if (uni.restoreGlobal) {
           this.stopRingtone();
           try {
             const res = await uni.request({
-              url: "http://106.53.30.150:9097/api/ringtone-status",
+              url: phoneApi("/api/ringtone-status"),
               method: "POST",
               data: {
                 userId: this.userId,
@@ -3554,16 +3703,16 @@ if (uni.restoreGlobal) {
               }
             });
             if (res.statusCode === 200 && res.data && res.data.code === 0) {
-              formatAppLog("log", "at pages/call-back/call-back.vue:591", "成功更新铃声状态为false");
+              formatAppLog("log", "at pages/call-back/call-back.vue:602", "成功更新铃声状态为false");
             } else {
-              formatAppLog("error", "at pages/call-back/call-back.vue:593", "更新铃声状态失败");
+              formatAppLog("error", "at pages/call-back/call-back.vue:604", "更新铃声状态失败");
             }
           } catch (error2) {
-            formatAppLog("error", "at pages/call-back/call-back.vue:596", "更新铃声状态时出错:", error2);
+            formatAppLog("error", "at pages/call-back/call-back.vue:607", "更新铃声状态时出错:", error2);
           }
           try {
             const statusRes = await uni.request({
-              url: "http://106.53.30.150:9097/api/update-call-status",
+              url: phoneApi("/api/update-call-status"),
               method: "POST",
               data: {
                 callId: this.callId,
@@ -3571,13 +3720,13 @@ if (uni.restoreGlobal) {
               }
             });
             if (statusRes.statusCode === 200 && statusRes.data && statusRes.data.code === 0) {
-              formatAppLog("log", "at pages/call-back/call-back.vue:611", "成功更新通话状态为正在通话");
+              formatAppLog("log", "at pages/call-back/call-back.vue:622", "成功更新通话状态为正在通话");
             } else {
-              formatAppLog("error", "at pages/call-back/call-back.vue:613", "更新通话状态失败:", ((_a = statusRes.data) == null ? void 0 : _a.msg) || "未知错误");
+              formatAppLog("error", "at pages/call-back/call-back.vue:624", "更新通话状态失败:", ((_a = statusRes.data) == null ? void 0 : _a.msg) || "未知错误");
               throw new Error(((_b = statusRes.data) == null ? void 0 : _b.msg) || "更新通话状态失败");
             }
           } catch (error2) {
-            formatAppLog("error", "at pages/call-back/call-back.vue:617", "更新通话状态时出错:", error2);
+            formatAppLog("error", "at pages/call-back/call-back.vue:628", "更新通话状态时出错:", error2);
             throw error2;
           }
           this.cleanup();
@@ -3585,10 +3734,10 @@ if (uni.restoreGlobal) {
           uni.redirectTo({
             url,
             success: () => {
-              formatAppLog("log", "at pages/call-back/call-back.vue:631", "成功跳转到通话页面");
+              formatAppLog("log", "at pages/call-back/call-back.vue:642", "成功跳转到通话页面");
             },
             fail: (err) => {
-              formatAppLog("error", "at pages/call-back/call-back.vue:634", "页面跳转失败:", err);
+              formatAppLog("error", "at pages/call-back/call-back.vue:645", "页面跳转失败:", err);
               uni.showToast({
                 title: "页面跳转失败",
                 icon: "none",
@@ -3600,7 +3749,7 @@ if (uni.restoreGlobal) {
             }
           });
         } catch (error2) {
-          formatAppLog("error", "at pages/call-back/call-back.vue:647", "接听方法出错:", error2);
+          formatAppLog("error", "at pages/call-back/call-back.vue:658", "接听方法出错:", error2);
           uni.showToast({
             title: error2.message || "接听失败",
             icon: "none",
@@ -3670,6 +3819,13 @@ if (uni.restoreGlobal) {
         class: "bg-img",
         mode: "aspectFill"
       }, null, 8, ["src"]),
+      vue.createElementVNode(
+        "view",
+        { class: "debug-bg-source" },
+        vue.toDisplayString($data.wallpaperDebugText),
+        1
+        /* TEXT */
+      ),
       vue.createElementVNode("view", { class: "call-content" }, [
         vue.createElementVNode("view", { class: "call-info" }, [
           vue.createElementVNode(
@@ -3771,7 +3927,7 @@ if (uni.restoreGlobal) {
         this.isLoading = true;
         try {
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/call-records",
+            url: phoneApi("/api/call-records"),
             method: "GET",
             data: {
               userId: this.userId,
@@ -3779,10 +3935,10 @@ if (uni.restoreGlobal) {
               pageSize: this.pageSize
             }
           });
-          formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:95", "Call records response:", response.data);
+          formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:97", "Call records response:", response.data);
           if (response.data.code === 0) {
             const newRecords = response.data.data.list.map((record) => {
-              formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:99", "Processing record:", {
+              formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:101", "Processing record:", {
                 call_id: record.call_id,
                 type: typeof record.call_id
               });
@@ -3810,7 +3966,7 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/batch-delete-records/batch-delete-records.vue:128", "获取通话记录失败:", error2);
+          formatAppLog("error", "at pages/batch-delete-records/batch-delete-records.vue:130", "获取通话记录失败:", error2);
           uni.showToast({
             title: "获取通话记录失败",
             icon: "none"
@@ -3889,22 +4045,22 @@ if (uni.restoreGlobal) {
             mask: true
           });
           const callIds = this.selectedItems.map((item) => {
-            formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:212", "Preparing to delete record:", {
+            formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:214", "Preparing to delete record:", {
               id: item.id,
               type: typeof item.id,
               number: item.number
             });
             return item.id;
           });
-          formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:220", "Sending delete request with IDs:", callIds);
+          formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:222", "Sending delete request with IDs:", callIds);
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/delete-call-record",
+            url: phoneApi("/api/delete-call-record"),
             method: "POST",
             data: {
               callId: callIds
             }
           });
-          formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:230", "Delete response:", {
+          formatAppLog("log", "at pages/batch-delete-records/batch-delete-records.vue:232", "Delete response:", {
             statusCode: response.statusCode,
             data: response.data,
             headers: response.header
@@ -3923,7 +4079,7 @@ if (uni.restoreGlobal) {
             throw new Error(response.data.msg || "删除失败");
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/batch-delete-records/batch-delete-records.vue:252", "删除记录失败:", error2);
+          formatAppLog("error", "at pages/batch-delete-records/batch-delete-records.vue:254", "删除记录失败:", error2);
           uni.showToast({
             title: error2.message || "删除失败",
             icon: "none",
@@ -4102,10 +4258,10 @@ if (uni.restoreGlobal) {
     onNavigationBarButtonTap(e) {
     },
     onLoad(options) {
-      formatAppLog("log", "at pages/call-details/call-details.vue:110", "call-details onLoad options:", options);
+      formatAppLog("log", "at pages/call-details/call-details.vue:111", "call-details onLoad options:", options);
       this.audioContext = uni.createInnerAudioContext();
       if (options.number) {
-        formatAppLog("log", "at pages/call-details/call-details.vue:114", "Received number in call-details:", decodeURIComponent(options.number));
+        formatAppLog("log", "at pages/call-details/call-details.vue:115", "Received number in call-details:", decodeURIComponent(options.number));
         this.number = decodeURIComponent(options.number);
         this.number = this.formatPhoneNumber(this.number);
         this.currentAvatarUrl = this.getAvatarUrl(this.number.replace(/\s/g, ""));
@@ -4133,14 +4289,14 @@ if (uni.restoreGlobal) {
         this.error = null;
         try {
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/call-records",
+            url: phoneApi("/api/call-records"),
             method: "GET",
             data: {
               number: this.number.replace(/\s/g, ""),
               userId: this.userId
             }
           });
-          formatAppLog("log", "at pages/call-details/call-details.vue:155", "Call records by number response:", response.data);
+          formatAppLog("log", "at pages/call-details/call-details.vue:156", "Call records by number response:", response.data);
           if (response.data.code === 0 && response.data.data && response.data.data.list) {
             this.callRecords = response.data.data.list;
             if (this.callRecords.length > 0) {
@@ -4159,7 +4315,7 @@ if (uni.restoreGlobal) {
             this.currentAvatarUrl = this.getAvatarUrl(this.number.replace(/\s/g, ""));
           }
         } catch (e) {
-          formatAppLog("error", "at pages/call-details/call-details.vue:178", "Failed to fetch call records by number:", e);
+          formatAppLog("error", "at pages/call-details/call-details.vue:179", "Failed to fetch call records by number:", e);
           this.error = "加载通话记录失败";
           this.callRecords = [];
         } finally {
@@ -4229,7 +4385,7 @@ if (uni.restoreGlobal) {
         return status;
       },
       dialNumber(number) {
-        formatAppLog("log", "at pages/call-details/call-details.vue:241", "Dialing number:", number);
+        formatAppLog("log", "at pages/call-details/call-details.vue:242", "Dialing number:", number);
         const cleanNumber = number.replace(/\s/g, "");
         uni.navigateTo({
           url: `/pages/call/calling?number=${encodeURIComponent(cleanNumber)}&location=${encodeURIComponent(this.location)}`
@@ -4245,14 +4401,14 @@ if (uni.restoreGlobal) {
         try {
           const callIds = this.callRecords.map((record) => record.call_id);
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/delete-call-record",
+            url: phoneApi("/api/delete-call-record"),
             method: "POST",
             data: {
               callId: callIds,
               userId: this.userId
             }
           });
-          formatAppLog("log", "at pages/call-details/call-details.vue:268", response);
+          formatAppLog("log", "at pages/call-details/call-details.vue:269", response);
           if (response.data.code === 0) {
             uni.showToast({
               title: "清空成功",
@@ -4266,7 +4422,7 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/call-details/call-details.vue:282", "Failed to clear call records:", error2);
+          formatAppLog("error", "at pages/call-details/call-details.vue:283", "Failed to clear call records:", error2);
           uni.showToast({
             title: "清空失败",
             icon: "none"
@@ -4493,7 +4649,7 @@ if (uni.restoreGlobal) {
         }
         try {
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/send-message",
+            url: phoneApi("/api/send-message"),
             method: "POST",
             data: {
               senderId: this.userId,
@@ -4516,8 +4672,8 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("log", "at pages/message/new-message.vue:79", error2);
-          formatAppLog("error", "at pages/message/new-message.vue:80", "Failed to send message:", error2);
+          formatAppLog("log", "at pages/message/new-message.vue:80", error2);
+          formatAppLog("error", "at pages/message/new-message.vue:81", "Failed to send message:", error2);
           uni.showToast({
             title: "发送失败",
             icon: "none"
@@ -4630,9 +4786,9 @@ if (uni.restoreGlobal) {
         this.isLoading = true;
         try {
           const cleanedPhone = this.phone.replace(/\s/g, "");
-          formatAppLog("log", "at pages/message/chat.vue:119", "Fetching messages with params:", { userId: this.userId, phone: cleanedPhone, page: this.page, pageSize: this.pageSize });
+          formatAppLog("log", "at pages/message/chat.vue:120", "Fetching messages with params:", { userId: this.userId, phone: cleanedPhone, page: this.page, pageSize: this.pageSize });
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/messages",
+            url: phoneApi("/api/messages"),
             method: "GET",
             data: {
               userId: this.userId,
@@ -4642,7 +4798,7 @@ if (uni.restoreGlobal) {
             }
           });
           if (response.data.code === 0) {
-            formatAppLog("log", "at pages/message/chat.vue:132", "Fetch messages successful, raw response:", response.data.data.list);
+            formatAppLog("log", "at pages/message/chat.vue:133", "Fetch messages successful, raw response:", response.data.data.list);
             const { list, total } = response.data.data;
             this.total = total;
             const formattedMessages = list.map((msg) => ({
@@ -4652,7 +4808,7 @@ if (uni.restoreGlobal) {
               ismy: msg.ismy === 1
               // 显式判断，如果后端返回1，则认为是自己的消息
             })).reverse();
-            formatAppLog("log", "at pages/message/chat.vue:143", "Formatted messages with ismy:", formattedMessages);
+            formatAppLog("log", "at pages/message/chat.vue:144", "Formatted messages with ismy:", formattedMessages);
             this.messages = isLoadMore ? [...formattedMessages, ...this.messages] : formattedMessages;
             this.hasMore = this.messages.length < total;
             if (this.hasMore) {
@@ -4681,8 +4837,8 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/message/chat.vue:176", "Error fetching messages:", error2);
-          formatAppLog("error", "at pages/message/chat.vue:177", "Failed to fetch messages:", error2);
+          formatAppLog("error", "at pages/message/chat.vue:177", "Error fetching messages:", error2);
+          formatAppLog("error", "at pages/message/chat.vue:178", "Failed to fetch messages:", error2);
           uni.showToast({
             title: "获取消息失败",
             icon: "none"
@@ -4701,9 +4857,9 @@ if (uni.restoreGlobal) {
             content: this.inputMessage.trim(),
             ismy: true
           };
-          formatAppLog("log", "at pages/message/chat.vue:196", "Sending message data to backend:", messageData);
+          formatAppLog("log", "at pages/message/chat.vue:197", "Sending message data to backend:", messageData);
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/send-message",
+            url: phoneApi("/api/send-message"),
             method: "POST",
             data: messageData
           });
@@ -4726,7 +4882,7 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/message/chat.vue:225", "Failed to send message:", error2);
+          formatAppLog("error", "at pages/message/chat.vue:226", "Failed to send message:", error2);
           uni.showToast({
             title: "发送失败",
             icon: "none"
@@ -4736,7 +4892,7 @@ if (uni.restoreGlobal) {
       async handleDelete() {
         try {
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/delete-conversation",
+            url: phoneApi("/api/delete-conversation"),
             method: "POST",
             data: {
               userId: this.userId,
@@ -4758,7 +4914,7 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/message/chat.vue:258", "Failed to delete conversation:", error2);
+          formatAppLog("error", "at pages/message/chat.vue:259", "Failed to delete conversation:", error2);
           uni.showToast({
             title: "删除失败",
             icon: "none"
@@ -4833,15 +4989,15 @@ if (uni.restoreGlobal) {
         }
       },
       async checkContactAndDisplay(number) {
-        formatAppLog("log", "at pages/message/chat.vue:335", "checkContactAndDisplay: Processing number:", number);
+        formatAppLog("log", "at pages/message/chat.vue:336", "checkContactAndDisplay: Processing number:", number);
         const cleanedNumber = number.replace(/\s/g, "");
         if (!cleanedNumber) {
-          formatAppLog("log", "at pages/message/chat.vue:338", "checkContactAndDisplay: Invalid number. Using original display.");
+          formatAppLog("log", "at pages/message/chat.vue:339", "checkContactAndDisplay: Invalid number. Using original display.");
           return;
         }
         try {
-          const apiUrl = `http://106.53.30.150:9097/api/contact`;
-          formatAppLog("log", "at pages/message/chat.vue:343", "checkContactAndDisplay: Calling API:", apiUrl, "with phone:", cleanedNumber);
+          const apiUrl = phoneApi("/api/contact");
+          formatAppLog("log", "at pages/message/chat.vue:344", "checkContactAndDisplay: Calling API:", apiUrl, "with phone:", cleanedNumber);
           const res = await uni.request({
             url: apiUrl,
             method: "POST",
@@ -4849,16 +5005,16 @@ if (uni.restoreGlobal) {
               phone: cleanedNumber
             }
           });
-          formatAppLog("log", "at pages/message/chat.vue:351", "checkContactAndDisplay: API response:", res);
+          formatAppLog("log", "at pages/message/chat.vue:352", "checkContactAndDisplay: API response:", res);
           if (res.statusCode === 200 && res.data && res.data.code === 0 && res.data.data) {
-            formatAppLog("log", "at pages/message/chat.vue:355", "checkContactAndDisplay: Contact found. Updating displayName.");
+            formatAppLog("log", "at pages/message/chat.vue:356", "checkContactAndDisplay: Contact found. Updating displayName.");
             this.displayName = res.data.data.name;
-            formatAppLog("log", "at pages/message/chat.vue:357", "checkContactAndDisplay: Updated displayName to:", this.displayName);
+            formatAppLog("log", "at pages/message/chat.vue:358", "checkContactAndDisplay: Updated displayName to:", this.displayName);
           } else {
-            formatAppLog("log", "at pages/message/chat.vue:360", "checkContactAndDisplay: Contact not found or API issue. Keeping initial displayName.");
+            formatAppLog("log", "at pages/message/chat.vue:361", "checkContactAndDisplay: Contact not found or API issue. Keeping initial displayName.");
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/message/chat.vue:363", "checkContactAndDisplay: Failed to check contact API:", error2);
+          formatAppLog("error", "at pages/message/chat.vue:364", "checkContactAndDisplay: Failed to check contact API:", error2);
         }
       }
     }
@@ -5062,7 +5218,7 @@ if (uni.restoreGlobal) {
         this.isLoading = true;
         try {
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/conversations",
+            url: phoneApi("/api/conversations"),
             method: "GET",
             data: {
               userId: this.userId
@@ -5085,7 +5241,7 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/message/message.vue:97", "Failed to fetch conversations:", error2);
+          formatAppLog("error", "at pages/message/message.vue:98", "Failed to fetch conversations:", error2);
           uni.showToast({
             title: "获取会话列表失败",
             icon: "none"
@@ -5125,7 +5281,7 @@ if (uni.restoreGlobal) {
           }
           try {
             const response = await uni.request({
-              url: "http://106.53.30.150:9097/api/delete-conversations",
+              url: phoneApi("/api/delete-conversations"),
               method: "POST",
               data: {
                 userId: this.userId,
@@ -5145,7 +5301,7 @@ if (uni.restoreGlobal) {
               });
             }
           } catch (error2) {
-            formatAppLog("error", "at pages/message/message.vue:160", "Failed to delete conversations:", error2);
+            formatAppLog("error", "at pages/message/message.vue:161", "Failed to delete conversations:", error2);
             uni.showToast({
               title: "删除失败",
               icon: "none"
@@ -5200,16 +5356,16 @@ if (uni.restoreGlobal) {
       },
       async deleteConversation(phone) {
         try {
-          formatAppLog("log", "at pages/message/message.vue:227", "Deleting conversation with phone:", phone);
+          formatAppLog("log", "at pages/message/message.vue:228", "Deleting conversation with phone:", phone);
           const response = await uni.request({
-            url: "http://106.53.30.150:9097/api/delete-conversation",
+            url: phoneApi("/api/delete-conversation"),
             method: "POST",
             data: {
               userId: this.userId,
               phone
             }
           });
-          formatAppLog("log", "at pages/message/message.vue:237", "Delete conversation response:", response);
+          formatAppLog("log", "at pages/message/message.vue:238", "Delete conversation response:", response);
           if (response.data.code === 0) {
             uni.showToast({
               title: "删除成功",
@@ -5223,7 +5379,7 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error2) {
-          formatAppLog("error", "at pages/message/message.vue:252", "Failed to delete conversation:", error2);
+          formatAppLog("error", "at pages/message/message.vue:253", "Failed to delete conversation:", error2);
           uni.showToast({
             title: "删除失败",
             icon: "none"

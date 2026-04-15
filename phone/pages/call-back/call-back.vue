@@ -1,6 +1,7 @@
 <template>
     <view class="call-bg">
       <image :src="imgUrl" class="bg-img" mode="aspectFill" />
+      <view class="debug-bg-source">{{ wallpaperDebugText }}</view>
       <view class="call-content">
         <!-- 顶部信息区域 -->
         <view class="call-info">
@@ -46,6 +47,7 @@
 		data() {
 			return {
 				imgUrl: '',
+				wallpaperDebugText: '背景来源：未初始化',
 				number: '186 8828 2571',
 				location: '广东佛山 联通',
 				status: '',
@@ -171,11 +173,15 @@
 
 		    // Existing logic to get background image
 		    this.imgUrl = '/static/images/bg.jpg';
+		    this.wallpaperDebugText = '背景来源：默认背景';
 		    // #ifdef APP-PLUS
 		    const ret = u7746wallpaper.getBackground('test.png');
 		    console.log(ret);
 		    if (ret.code === "1") {
 		      this.imgUrl = ret.msg;
+		      this.wallpaperDebugText = `背景来源：系统壁纸 code=${ret.code}`;
+		    } else {
+		      this.wallpaperDebugText = `背景来源：默认背景 code=${ret.code || 'unknown'}`;
 		    }
 		    // #endif
 
@@ -752,6 +758,19 @@
     z-index: 0;
 }
 
+.debug-bg-source {
+    position: absolute;
+    top: 88rpx;
+    left: 24rpx;
+    z-index: 3;
+    padding: 10rpx 16rpx;
+    border-radius: 999rpx;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    font-size: 22rpx;
+    line-height: 1.4;
+}
+
 .call-content {
     position: relative;
     z-index: 2;
@@ -874,6 +893,5 @@
     display: none;
 }
 </style>
-
 
 

@@ -85,3 +85,21 @@
   font-size: 1.125rem;
   text-align: center;
 }
+.contacts-list[data-v-90a1bbf6] {
+  padding: 0.75rem 1.125rem 1.25rem;
+}
+.contact-item[data-v-90a1bbf6] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 0.25rem;
+  border-bottom: 0.03125rem solid #f0f0f0;
+}
+.contact-name[data-v-90a1bbf6] {
+  color: #222;
+  font-size: 1.0625rem;
+}
+.contact-phone[data-v-90a1bbf6] {
+  color: #666;
+  font-size: 0.9375rem;
+}

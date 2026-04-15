@@ -462,6 +462,18 @@ async def websocket_handler(websocket):
 # --- HTTP 服务器 (用于获取历史记录 和 处理拨号请求) ---
 class CallRecordsHTTPHandler(http.server.BaseHTTPRequestHandler):
 
+    def log_message(self, format, *args):
+        try:
+            message = format % args
+        except Exception:
+            message = format
+
+        # 忽略高频轮询接口的默认访问日志，保留其他请求日志
+        if '/api/check-incoming-calls' in message:
+            return
+
+        super().log_message(format, *args)
+
     # 允许 CORS 预检请求
     def do_OPTIONS(self):
         self.send_response(HTTPStatus.OK)
@@ -2017,8 +2029,6 @@ class CallRecordsHTTPHandler(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(response_data).encode('utf-8'))
                 return
 
-            print(f"Checking incoming calls for user_id: {target_user_id}")
-
             conn = get_db_connection()
             if not conn:
                 self.send_response(HTTPStatus.INTERNAL_SERVER_ERROR)
@@ -2042,7 +2052,6 @@ class CallRecordsHTTPHandler(http.server.BaseHTTPRequestHandler):
                 """
                 cursor.execute(sql, (target_user_id,))
                 incoming_call = cursor.fetchone()
-                print(f"Incoming call check result for user {target_user_id}: {incoming_call}")
 
                 self.send_response(HTTPStatus.OK)
                 self.send_header('Content-type', 'application/json')
@@ -2050,6 +2059,7 @@ class CallRecordsHTTPHandler(http.server.BaseHTTPRequestHandler):
                 self.end_headers()
 
                 if incoming_call:
+                    print(f"[incoming-call] 检测到来电: user_id={target_user_id}, call_id={incoming_call['call_id']}, number={incoming_call['dialed_number']}")
                     response_data = {
                         'code': 0,
                         'msg': 'Success',
@@ -2120,41 +2130,56 @@ class CallRecordsHTTPHandler(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(response_data).encode('utf-8'))
                 return
 
-            # 验证手机号格式
-            if not re.match(r'^1[3-9]\d{9}$', phone):
+            # 兼容 7 位号段和 11 位手机号查询
+            if not re.match(r'^(\d{7}|1[3-9]\d{9})$', phone):
                 self.send_response(HTTPStatus.BAD_REQUEST)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                response_data = {'code': 1, 'msg': 'Invalid phone number format'}
+                response_data = {'code': 1, 'msg': 'Invalid phone number format, expected 7 or 11 digits'}
                 self.wfile.write(json.dumps(response_data).encode('utf-8'))
                 return
 
             try:
-                # 调用阿里云API查询归属地
-                url = f'https://jisusjhmcx.market.alicloudapi.com/shouji/query?shouji={phone}'
+                appcode = '46272f643425432a86b3977ba66c7798'
+                url = 'https://ec8a.api.huachen.cn/mobile'
                 headers = {
-                    'Authorization': 'APPCODE 2d27d29e43df4960a21ae35440eea039'
+                    'Authorization': f'APPCODE {appcode}'
                 }
-                response = requests.get(url, headers=headers)
-                data = response.json()
+                params = {
+                    'mobile': phone
+                }
+                print(f"[phone-location] 查询号码归属地: phone={phone}")
+                response = requests.get(url, headers=headers, params=params, timeout=10)
+                raw_text = response.text
+                try:
+                    data = response.json()
+                except ValueError:
+                    data = {
+                        'raw': raw_text
+                    }
+                print(f"[phone-location] 第三方响应: status={response.status_code}, body={data}")
 
-                if response.status_code == 200 and data.get('status') == 0:
-                    result = data.get('result', {})
+                result = data.get('data') or data.get('result') or data
+                province = result.get('province') or result.get('prov') or result.get('region') or ''
+                city = result.get('city') or result.get('area') or ''
+                company = result.get('company') or result.get('isp') or result.get('sp') or result.get('carrier') or ''
+
+                if response.status_code == 200 and (province or city or company):
                     response_data = {
                         'code': 0,
                         'msg': 'Success',
                         'data': {
-                            'province': result.get('province', ''),
-                            'city': result.get('city', ''),
-                            'company': result.get('company', '')
+                            'province': province,
+                            'city': city,
+                            'company': company
                         }
                     }
                 else:
                     response_data = {
                         'code': 1,
-                        'msg': 'Failed to get location info',
-                        'data': None
+                        'msg': data.get('msg') or data.get('message') or 'Failed to get location info',
+                        'data': result if isinstance(result, dict) else None
                     }
 
                 self.send_response(HTTPStatus.OK)

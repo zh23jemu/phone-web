@@ -41,22 +41,9 @@ export function phoneApi(path) {
 }
 
 export function getPhoneLocationApiUrl(phone) {
-	return `${PHONE_LOCATION_HOST}${PHONE_LOCATION_PATH}?mobile=${phone}`;
+	return phoneApi(`/api/phone-location?phone=${phone}`);
 }
 
 export function getPhoneLocationHeaders() {
-	let appcode = DEFAULT_PHONE_LOCATION_APPCODE;
-
-	try {
-		const customAppcode = uni.getStorageSync('phoneLocationAppCode');
-		if (customAppcode) {
-			appcode = customAppcode;
-		}
-	} catch (error) {
-		console.warn('读取号码归属地 AppCode 失败:', error);
-	}
-
-	return {
-		Authorization: `APPCODE ${appcode}`
-	};
+	return {};
 }

@@ -8,6 +8,7 @@
       }"
     >
       <image :src="imgUrl" class="bg-img" mode="aspectFill" />
+      <view class="debug-bg-source">{{ wallpaperDebugText }}</view>
       <view class="call-content">
         <view class="call-number">{{ number }}</view>
         <view class="call-location">
@@ -77,6 +78,7 @@
 		data() {
 			return {
 				imgUrl: '',
+				wallpaperDebugText: '背景来源：未初始化',
 				number: '186 8828 2571',
 				location: '未知',
 				status: '正在拨号...',
@@ -399,19 +401,23 @@
 		    // 如果缓存存在且未过期（24小时内的缓存）
 		    if (cachedBg && cacheTime && (now - cacheTime < 24 * 60 * 60 * 1000)) {
 		        this.imgUrl = cachedBg;
+		        this.wallpaperDebugText = '背景来源：缓存壁纸';
 		        console.log('Using cached background image');
 		    } else {
 		        // 缓存不存在或已过期，重新获取
 		        this.imgUrl = '/static/images/bg.jpg';
+		        this.wallpaperDebugText = '背景来源：默认背景';
 		        // #ifdef APP-PLUS
 		        const ret = u7746wallpaper.getBackground('test.png');
 		        if (ret.code === "1") {
 		            this.imgUrl = ret.msg;
+		            this.wallpaperDebugText = `背景来源：系统壁纸 code=${ret.code}`;
 		            // 更新缓存
 		            uni.setStorageSync('cached_background', ret.msg);
 		            uni.setStorageSync('background_cache_time', now);
 		            console.log('Updated background image cache');
 		        } else {
+		            this.wallpaperDebugText = `背景来源：默认背景 code=${ret.code || 'unknown'}`;
 		            console.log('Using default background image');
 		        }
 		        // #endif
@@ -1243,6 +1249,18 @@
     width: 100vw;
     height: 100vh;
     z-index: 0;
+  }
+  .debug-bg-source {
+    position: absolute;
+    top: 88rpx;
+    left: 24rpx;
+    z-index: 3;
+    padding: 10rpx 16rpx;
+    border-radius: 999rpx;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    font-size: 22rpx;
+    line-height: 1.4;
   }
   .call-content {
     position: relative;
