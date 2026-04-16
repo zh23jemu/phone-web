@@ -23,6 +23,7 @@
 <script>
 import { phoneApi } from '@/utils/api';
 import { fixGarbledText } from '@/utils/text';
+import { isHiddenContact } from '@/utils/hidden-contacts';
 
 const CP1252_BYTE_MAP = {
     0x20AC: 0x80,
@@ -148,13 +149,12 @@ export default {
                     });
 
                     if (response.data.code === 0) {
-                    const hiddenContactNames = ['中国移动', '中国联通', '中国电信'];
                     this.contacts = (response.data.data || [])
                         .map(contact => ({
                             ...contact,
                             name: fixGarbledText(contact.name)
                         }))
-                        .filter(contact => !hiddenContactNames.includes((contact.name || '').trim()));
+                        .filter(contact => !isHiddenContact(contact));
                 } else {
                     // uni.showToast({
                     //     title: '获取联系人失败',
