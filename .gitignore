@@ -38,8 +38,15 @@ logs/
 # uni-app / HBuilderX generated files
 phone/unpackage/
 phone/.hbuilderx/private.config.json
+phone/resources/
+phone-sms/unpackage/
+phone-sms/.hbuilderx/private.config.json
+phone-sms/resources/
 message/unpackage/
 message/.hbuilderx/private.config.json
+*/unpackage/
+*/resources/
+*/.hbuilderx/private.config.json
 
 # Node
 node_modules/
@@ -55,4 +62,3 @@ likeadmin_php-master/admin/dist/
 # Docker / database local data
 likeadmin_php-master/docker/data/
 likeadmin_php-master/docker/log/
-

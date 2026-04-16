@@ -1,0 +1,100 @@
+{
+	"pages": [
+		{
+			"path": "pages/dial/dial",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/auth/login",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/call/calling",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/contacts/contacts",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/favorite/favorite",
+			"style": {"navigationStyle": "custom"}
+		},
+		{
+			"path" : "pages/call-back/call-back",
+			"style" : 
+			{
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path" : "pages/batch-delete-records/batch-delete-records",
+			"style" : 
+			{
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path" : "pages/call-details/call-details",
+			"style" : 
+			{
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path" : "pages/message/new-message",
+			"style" : 
+			{
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path" : "pages/message/chat",
+			"style" : 
+			{
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path" : "pages/message/message",
+			"style" : 
+			{
+				"navigationStyle": "custom"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "仿真短信",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+			"background": "#efeff4"
+		}
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#4CD964",
+		"borderStyle": "white",
+		"backgroundColor": "#fff",
+		"list": [{
+			"pagePath": "pages/message/message",
+			"iconPath": "/static/icons/add1.png",
+			"selectedIconPath": "/static/icons/add1.png",
+			"text": "信息"
+		}, {
+			"pagePath": "pages/contacts/contacts",
+			"iconPath": "/static/icons/lxr.png",
+			"selectedIconPath": "/static/icons/s_lxr.png",
+			"text": "联系人"
+		}]
+	}
+}

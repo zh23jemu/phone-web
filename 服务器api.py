@@ -1029,7 +1029,7 @@ class CallRecordsHTTPHandler(http.server.BaseHTTPRequestHandler):
                 sender_id = data.get('senderId')
                 receiver_phone = data.get('receiverPhone')
                 content = data.get('content')
-                ismy = data.get('ismy') # Get ismy from request
+                ismy = 1 if data.get('ismy', True) else 0
                 
                 if not sender_id or not receiver_phone or not content:
                     self.send_error_response('Missing required parameters')
